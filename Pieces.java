@@ -2,6 +2,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.text.Style;
+
 public class Pieces {
 
     public static Piece[][] board = new Piece[8][8];
@@ -439,5 +441,52 @@ public class Pieces {
         }
         return attackers;
 
+    }
+    public static boolean pieceBlocks(Square toBlock,Square attacker,Square blocker){
+        //if they are being attacked in a line eg rook
+        if(toBlock.getX()==attacker.getX()){
+           
+            return (blocker.getX() ==toBlock.getX()&&((blocker.getY()<toBlock.getY()&&blocker.getY()>attacker.getY())||(blocker.getY()>toBlock.getY()&&blocker.getY()<attacker.getY())));
+        }
+        if(toBlock.getY()==attacker.getY()){
+            return (blocker.getY() ==toBlock.getY()&&((blocker.getX()<toBlock.getX()&&blocker.getX()>attacker.getX())||(blocker.getX()>toBlock.getX()&&blocker.getX()<attacker.getX())));
+        }
+        //otherwise they must be being attacked by a diagonal
+        Square sq = new Square();
+        attacker.copy(sq);
+        int direction;
+        if(attacker.getX()>toBlock.getX()){
+            direction =0;
+
+        }else{
+            direction = 2;
+        }
+        if(attacker.getY()>toBlock.getY()){
+            direction++;
+
+        }
+        System.out.println(direction);
+        while(!sq.equals(toBlock)){
+           
+            if(direction == 2){
+            sq.setX(sq.getX()+1);
+            sq.setY(sq.getY()+1);
+            }else if(direction == 0){
+            sq.setX(sq.getX()-1);
+            sq.setY(sq.getY()+1);
+            }else if( direction == 3){
+            sq.setX(sq.getX()+1);
+            sq.setY(sq.getY()-1);
+            }else{
+            sq.setX(sq.getX()-1);
+            sq.setY(sq.getY()-1);
+        }
+            System.out.println(sq.toString());
+            if(sq.equals(blocker)){
+                return true;
+            }
+        }
+
+return false;
     }
 }

@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import javax.swing.*;
+import java.util.Iterator;
 
 public class OnMouseClick {
      static Square clickedSquare;
@@ -12,6 +13,35 @@ public class OnMouseClick {
         // if they clicked on their own piece
         if(Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].color == Main.curTurn){
             squares = Pieces.movement(square);
+            //if the king is under attack
+            if(threats!=null&&!threats.isEmpty()&&Pieces.board[square.getX()][square.getY()].type != PType.KING){
+                //by one attacker
+               if (threats.size()==1){
+
+                   Square curking;
+                   if(Main.curTurn == PColor.BLACK){
+                       curking = Board.bkinSquare;
+                   }else{
+                curking = Board.wKingSquare;
+            }
+                boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].type==PType.KING);
+                Iterator<Square> iter = squares.iterator(); 
+                while(iter.hasNext()){
+                    Square tmpS = iter.next();
+                    if(tmpS.equals(threats.get(0))||(!isKnight&&Pieces.pieceBlocks(curking,threats.get(0),tmpS))){
+                        continue;
+                    }
+                    iter.remove();
+                }
+                }else{
+                    if(!square.equals(Board.bkinSquare)&&!square.equals(Board.wKingSquare)){
+                        for(int i =0;i<squares.size();i++){
+                        squares.remove(i);
+                    }
+                    }
+                }
+                
+            }
             clickedSquare = square;
             for(Square s: squares){
                 if(Pieces.board[s.getX()][s.getY()]==null){
