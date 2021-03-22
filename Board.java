@@ -17,14 +17,12 @@ public class Board { //notice implements ActionListener
    static JPanel[][] boardPanel = new JPanel[8][8];
     static JFrame frame;
     static JPanel jp;
-    static ArrayList<JLabel> circBoxes = new ArrayList<JLabel>();
+    static JTextArea textLabel;
+    static ArrayList<JLabel> circBoxes = new ArrayList<>();
     static String moveOrder="";
-
-    private Board(){
-         //creates a Java Frame called frame
-        
-       
-    }
+    static Piece enpassant;
+    static ArrayList<Square> kingThreats;
+    static Square wKingSquare,bkinSquare;
 
     public static void makeNewBoard(){
         frame = new JFrame();
@@ -39,7 +37,7 @@ public class Board { //notice implements ActionListener
         jp.setBackground(new java.awt.Color(100, 255, 100));
         frame.add(jp); 
 
-
+        //Move order to txt button
         JButton b=new JButton("Save mv Order");  
         b.setBounds(l +50,h-50,115,30);  
         b.addActionListener(new ActionListener(){
@@ -52,6 +50,21 @@ public class Board { //notice implements ActionListener
             }  
         });
         jp.add(b);  
+        //move order jp
+         JPanel moveOrderJP = new JPanel();
+        moveOrderJP.setBounds(l+50, h-300, 215, 200);
+        textLabel = new JTextArea( "", 6, 20);
+            textLabel.setLineWrap(true);
+            textLabel.setWrapStyleWord(true);
+            textLabel.setOpaque(false);
+            textLabel.setEditable(false);
+
+            moveOrderJP.add(textLabel);
+        
+        //textLabel.setFont(new Font("Verdana",1,20));
+        moveOrderJP.add(textLabel);
+        jp.add(moveOrderJP);
+
 
         for(int i=0;i<8;i++){
             for(int j=0;j<8;j++){
@@ -92,12 +105,12 @@ public class Board { //notice implements ActionListener
     }
     public static void removeCircles(){
         for(JLabel s: circBoxes){
-           // System.out.println(s.toString());
+           
             Container parent = s.getParent();
             if(parent!=null){
             parent.remove(s);}
         }
-        circBoxes = new ArrayList<JLabel>();
+        circBoxes = new ArrayList<>();
 
 }
     public static void displayPossibleMoves(Square s){
@@ -112,10 +125,10 @@ public class Board { //notice implements ActionListener
     public static void addToMoveOrder(PColor c,String type,Square s,Square clickedSquare){
         if(c ==PColor.WHITE ){
         moveOrder += moveNumb + ".";
-        System.out.println("called");
+        
         }else{
             moveNumb++;
-            System.out.println("incr");
+           
         }
         if(didCastleShort){moveOrder += "O-O "; didCastleShort = false; return;}
         if(didCastleLong){moveOrder += "O-O-O ";didCastleLong = false; return;}
@@ -152,10 +165,10 @@ public class Board { //notice implements ActionListener
             moveOrder += ""+x+y;
         }
     moveOrder+=' ';
+    textLabel.setText(moveOrder);
     }
     private static void otherPieceCanMove(Square destinationSquare, Square originalSquare){
-        ArrayList<Square> moveable = new ArrayList<Square>();
-        moveable = Pieces.movement(destinationSquare);
+        ArrayList<Square> moveable = Pieces.movement(destinationSquare);
         for(Square s: moveable){
             if(s == null){continue;}
             if(Pieces.board[s.getX()][s.getY()] == null){continue;}

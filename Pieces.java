@@ -1,10 +1,12 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Pieces {
 
     public static Piece[][] board = new Piece[8][8];
-    static Boolean whiteCanCastleShort, whiteCanCastleLong;
-    static Boolean blackCanCastleShort, blackCanCastleLong;
+    static boolean whiteCanCastleShort, whiteCanCastleLong;
+    static boolean blackCanCastleShort, blackCanCastleLong;
     
     /*{{Piece.BLACK_ROOK, Piece.BLACK_KNIGHT, Piece.BLACK_BISHOP, Piece.BLACK_QUEEN, Piece.BLACK_KING, Piece.BLACK_BISHOP, Piece.BLACK_KNIGHT, Piece.BLACK_ROOK},
         {Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN},
@@ -15,7 +17,7 @@ public class Pieces {
         {Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN},
         {Piece.WHITE_ROOK, Piece.WHITE_KNIGHT, Piece.WHITE_BISHOP, Piece.WHITE_QUEEN, Piece.WHITE_KING, Piece.WHITE_BISHOP, Piece.WHITE_KNIGHT, Piece.WHITE_ROOK}};*/
 
-    public Pieces(){
+     Pieces(){
         initBoard();
     }
 
@@ -25,6 +27,8 @@ public class Pieces {
         blackCanCastleShort=true;
          blackCanCastleLong = true;
         PColor curColor = null;
+        Board.bkinSquare = new Square(4, 0);
+        Board.wKingSquare = new Square(4, 7);
 
         for(int i = 0; i < 8; i+=7){
             if(i == 0){
@@ -53,7 +57,7 @@ public class Pieces {
 
     public static ArrayList<Square> movement(Square square){
 
-        ArrayList<Square> moveable = new ArrayList<Square>();
+        ArrayList<Square> moveable = new ArrayList<>();
         if(board[square.getX()][square.getY()] == null){return moveable;}
         Piece p = board[square.getX()][square.getY()];
         switch(p.type){
@@ -114,98 +118,67 @@ public class Pieces {
                     blackCanCastleShort = false;
                 }
                 }
-                moveable = rookMovement(square, p.color);
+                moveable = rookMovement(square, p.color,true);
                 break;
             case KNIGHT:
             
-                Square s = new Square(square.getX() - 2, square.getY() - 1);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() - 1, square.getY() - 2);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() + 2, square.getY() + 1);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() + 1, square.getY() + 2);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() - 1, square.getY() + 2);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() - 2, square.getY() + 1);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() + 1, square.getY() - 2);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
-                s = new Square(square.getX() + 2, square.getY() - 1);
-                if(checkIfMoveable(s, p.color)){
-                    moveable.add(s);
-                }
+                moveable = knightMovement(square,p.color,true);
 
                 break;
                 
             case BISHOP:
            
-                moveable = bishopMovment(square, p.color);
+                moveable = bishopMovment(square, p.color,true);
                 break;
             case QUEEN:
-            moveable = rookMovement(square, p.color);
-            moveable.addAll(bishopMovment(square, p.color));
+            moveable = rookMovement(square, p.color,true);
+            moveable.addAll(bishopMovment(square, p.color,true));
                 break;
             case KING:
             Square sq = new Square(square.getX(), square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY());
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX(), square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() - 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() - 1, square.getY());
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() -1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
                     moveable.add(sq);
                 }
                 if(board[square.getX()][square.getY()].color == PColor.WHITE){
-                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null){
+                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null&&threatsToPiece(p.color, new Square(2, 7)).isEmpty()&&threatsToPiece(p.color, new Square(1, 7)).isEmpty()&&threatsToPiece(p.color, new Square(3, 7)).isEmpty()&&OnMouseClick.threats.isEmpty()){
                       moveable.add(new Square(2, 7));
                     }
-                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null){
+                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null&&threatsToPiece(p.color, new Square(5, 7)).isEmpty()&&threatsToPiece(p.color, new Square(6, 7)).isEmpty()&&OnMouseClick.threats.isEmpty()){
                       moveable.add(new Square(6, 7));
                     }
                   }else{
-                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null){
+                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(3, 0)).isEmpty()&&threatsToPiece(p.color, new Square(2, 0)).isEmpty()&&threatsToPiece(p.color, new Square(1, 0)).isEmpty()){
                           moveable.add(new Square(2, 0));
                         }
-                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null){
+                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(5, 7)).isEmpty()&&threatsToPiece(p.color, new Square(6, 7)).isEmpty()){
                           moveable.add(new Square(6, 0));
                         }
                   
@@ -247,21 +220,62 @@ public class Pieces {
         return false;
     }
     
-    
+    private static ArrayList<Square> knightMovement(Square square,PColor color,boolean movement){
+        ArrayList<Square> moveable = new ArrayList<>();
+        Square s = new Square(square.getX() - 2, square.getY() - 1);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() - 1, square.getY() - 2);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() + 2, square.getY() + 1);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() + 1, square.getY() + 2);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() - 1, square.getY() + 2);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() - 2, square.getY() + 1);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() + 1, square.getY() - 2);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() + 2, square.getY() - 1);
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                    moveable.add(s);
+                }
+                return moveable;
+    }
     
 
-    private static ArrayList<Square> rookMovement(Square square,PColor color){
-        ArrayList<Square> moveable = new ArrayList<Square>();
+    private static ArrayList<Square> rookMovement(Square square,PColor color,boolean movement){
+        ArrayList<Square> moveable = new ArrayList<>();
         int x = square.getX();
         int y = square.getY();
         //y down
         for(int i = y+1;i<8;i++){
             Square s = new Square(x,i);
             if(!checkIfMoveable(s, color)){
+               
                 break;
             }else{
-                moveable.add(s);
+                if(movement){
+                    moveable.add(s);
+                    }
                 if (board[x][i]!=null){
+                    if(!movement){
+                        moveable.add(s);
+                    }
                     break;
                 }
             }
@@ -272,8 +286,13 @@ public class Pieces {
             if(!checkIfMoveable(s, color)){
                 break;
             }else{
+                if(movement){
                 moveable.add(s);
+                }
                 if (board[x][i]!=null){
+                    if(!movement){
+                        moveable.add(s);
+                    }
                     break;
                 }
             }
@@ -284,8 +303,13 @@ public class Pieces {
             if(!checkIfMoveable(s, color)){
                 break;
             }else{
-                moveable.add(s);
+                if(movement){
+                    moveable.add(s);
+                    }
                 if (board[i][y]!=null){
+                    if(!movement){
+                        moveable.add(s);
+                    }
                     break;
                 }
             }
@@ -296,8 +320,13 @@ public class Pieces {
             if(!checkIfMoveable(s, color)){
                 break;
             }else{
-                moveable.add(s);
+                if(movement){
+                    moveable.add(s);
+                    }
                 if (board[i][y]!=null){
+                    if(!movement){
+                        moveable.add(s);
+                    }
                     break;
                 }
             }
@@ -306,8 +335,8 @@ public class Pieces {
         return moveable;
     }
 
-    private static ArrayList<Square> bishopMovment(Square square,PColor color){
-        ArrayList<Square> moveable = new ArrayList<Square>();
+    private static ArrayList<Square> bishopMovment(Square square,PColor color,boolean movement){
+        ArrayList<Square> moveable = new ArrayList<>();
         int x = square.getX();
         int y = square.getY();
         //right diags
@@ -318,8 +347,13 @@ public class Pieces {
         
         if(cntDown){
             if(checkIfMoveable(s, color)){
+                if(movement){
                 moveable.add(s);
+            }
                 if (board[s.getX()][s.getY()]!=null){
+                    if(!movement){
+                        moveable.add(s);
+                    }
                     cntDown =false;
                 }
                 
@@ -329,8 +363,13 @@ public class Pieces {
         }
         if(cntUp){
             if(checkIfMoveable(s2, color)){
-                moveable.add(s2);
+                if(movement){
+                    moveable.add(s2);
+                }
                 if (board[s2.getX()][s2.getY()]!=null){//////
+                    if(!movement){
+                        moveable.add(s2);
+                    }
                     cntUp =false;
                 }
                
@@ -343,15 +382,19 @@ public class Pieces {
     cntUp = true;
     cntDown = true;
         //left diags
-        System.out.println("trying left");
         for(int i = x-1;i>=0;i--){
             Square s = new Square(i,y+x-i);
             Square s2 = new Square(i,y-x+i);
         
         if(cntDown){
             if(checkIfMoveable(s, color)){
-                moveable.add(s);
+                if(movement){
+                    moveable.add(s);
+                }
                 if (board[s.getX()][s.getY()]!=null){
+                    if(!movement){
+                        moveable.add(s);
+                    }
                     cntDown =false;
                 }
             }else{
@@ -359,11 +402,15 @@ public class Pieces {
             }
         }
         if(cntUp){
-            System.out.println("goin up");
+            
             if(checkIfMoveable(s2, color)){
-                System.out.println("that new new");
-                moveable.add(s2);
+                if(movement){
+                    moveable.add(s2);
+                }
                 if (board[s2.getX()][s2.getY()]!=null){
+                    if(!movement){
+                        moveable.add(s2);
+                    }
                     cntUp =false;
                 }
             }else{ 
@@ -373,5 +420,24 @@ public class Pieces {
         if (!cntUp&&!cntDown){break;}
         }
         return moveable;
+    }
+    public static ArrayList<Square> threatsToPiece(PColor color,Square square){
+        ArrayList<Square> rookThreats = rookMovement(square, color, false);
+        ArrayList<Square> diagnalThreats = bishopMovment(square, color, false);
+        ArrayList<Square> attackers= knightMovement(square, color, false);
+        for(Square s: rookThreats){
+            if(board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.ROOK){
+                attackers.add(s);
+            }
+
+        }
+        for(Square s: diagnalThreats){
+            if(board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.BISHOP||board[s.getX()][s.getY()].type==PType.PAWN){
+                attackers.add(s);
+            }
+
+        }
+        return attackers;
+
     }
 }

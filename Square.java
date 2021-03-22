@@ -21,10 +21,7 @@ public class Square {
     @Override
     public boolean equals(Object o){
         Square s = (Square) o;
-        if(this.x == s.getX() && this.y == s.getY()){
-            return true;
-        }
-        return false;
+        return (this.x == s.getX() && this.y == s.getY());
     }
 
 }
