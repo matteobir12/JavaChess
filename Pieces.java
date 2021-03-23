@@ -264,11 +264,23 @@ public class Pieces {
         ArrayList<Square> moveable = new ArrayList<>();
         int x = square.getX();
         int y = square.getY();
+        int p =0;
+        Square possibleAttacker =new Square();
+        Square possiblePin =new Square();
         //y down
         for(int i = y+1;i<8;i++){
             Square s = new Square(x,i);
             if(!checkIfMoveable(s, color)){
-               
+               if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+                if(p==1){
+                    System.out.println("nothing to report");
+                    break;
+                }
+                p++;
+                s.copy(possiblePin);
+                continue;
+               }
+
                 break;
             }else{
                 if(movement){
@@ -276,16 +288,40 @@ public class Pieces {
                     }
                 if (board[x][i]!=null){
                     if(!movement){
-                        moveable.add(s);
+                        if(p==0){
+                        moveable.add(s);}
+                        else{
+                            //if we are in "pin mode" and its a piece that can pin 
+                            System.out.println("hold on I got something");
+                            if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+                                System.out.println("I'm pinned down!");
+                                s.copy(possibleAttacker);
+                                OnMouseClick.pinned.add(possiblePin);
+                                OnMouseClick.attackers.add(possibleAttacker);
+                            }
+                        }
                     }
                     break;
                 }
             }
         }
         //y up
+        if(!movement){
+        p=0;
+        possibleAttacker =new Square();
+         possiblePin =new Square();
+    }
         for(int i =y-1;i>=0;i--){
             Square s = new Square(x,i);
             if(!checkIfMoveable(s, color)){
+                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+                    if(p==1){
+                        break;
+                    }
+                    p++;
+                    s.copy(possiblePin);
+                    continue;
+                   }
                 break;
             }else{
                 if(movement){
@@ -293,16 +329,38 @@ public class Pieces {
                 }
                 if (board[x][i]!=null){
                     if(!movement){
-                        moveable.add(s);
+                        if(p==0){
+                            moveable.add(s);}
+                            else{
+                                //if we are in "pin mode" and its a piece that can pin 
+                                if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+                                    s.copy(possibleAttacker);
+                                    OnMouseClick.pinned.add(possiblePin);
+                                    OnMouseClick.attackers.add(possibleAttacker);
+                                }
+                            }
                     }
                     break;
                 }
             }
         }
 //x right
+        if(!movement){
+            p=0;
+            possibleAttacker =new Square();
+            possiblePin =new Square();
+        }
         for(int i =x+1;i<8;i++){
             Square s = new Square(i,y);
             if(!checkIfMoveable(s, color)){
+                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+                    if(p==1){
+                        break;
+                    }
+                    p++;
+                    s.copy(possiblePin);
+                    continue;
+                   }
                 break;
             }else{
                 if(movement){
@@ -310,16 +368,38 @@ public class Pieces {
                     }
                 if (board[i][y]!=null){
                     if(!movement){
-                        moveable.add(s);
+                        if(p==0){
+                            moveable.add(s);}
+                            else{
+                                //if we are in "pin mode" and its a piece that can pin 
+                                if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+                                    s.copy(possibleAttacker);
+                                    OnMouseClick.pinned.add(possiblePin);
+                                    OnMouseClick.attackers.add(possibleAttacker);
+                                }
+                            }
                     }
                     break;
                 }
             }
         }
         //x left
+        if(!movement){
+            p=0;
+            possibleAttacker =new Square();
+             possiblePin =new Square();
+        }
         for(int i =x-1;i>=0;i--){
             Square s = new Square(i,y);
             if(!checkIfMoveable(s, color)){
+                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+                    if(p==1){
+                        break;
+                    }
+                    p++;
+                    s.copy(possiblePin);
+                    continue;
+                   }
                 break;
             }else{
                 if(movement){
@@ -327,7 +407,16 @@ public class Pieces {
                     }
                 if (board[i][y]!=null){
                     if(!movement){
-                        moveable.add(s);
+                        if(p==0){
+                            moveable.add(s);}
+                            else{
+                                //if we are in "pin mode" and its a piece that can pin 
+                                if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+                                    s.copy(possibleAttacker);
+                                    OnMouseClick.pinned.add(possiblePin);
+                                    OnMouseClick.attackers.add(possibleAttacker);
+                                }
+                            }
                     }
                     break;
                 }
@@ -424,6 +513,8 @@ public class Pieces {
         return moveable;
     }
     public static ArrayList<Square> threatsToPiece(PColor color,Square square){
+        OnMouseClick.pinned = new ArrayList<>();
+        OnMouseClick.attackers = new ArrayList<>();
         ArrayList<Square> rookThreats = rookMovement(square, color, false);
         ArrayList<Square> diagnalThreats = bishopMovment(square, color, false);
         ArrayList<Square> attackers= knightMovement(square, color, false);
@@ -454,34 +545,21 @@ public class Pieces {
         //otherwise they must be being attacked by a diagonal
         Square sq = new Square();
         attacker.copy(sq);
-        int direction;
+        int modx =1;
+        int mody = 1;
         if(attacker.getX()>toBlock.getX()){
-            direction =0;
-
-        }else{
-            direction = 2;
+           modx = -1;
         }
         if(attacker.getY()>toBlock.getY()){
-            direction++;
+            mody = -1;
 
         }
-        System.out.println(direction);
+    
         while(!sq.equals(toBlock)){
            
-            if(direction == 2){
-            sq.setX(sq.getX()+1);
-            sq.setY(sq.getY()+1);
-            }else if(direction == 0){
-            sq.setX(sq.getX()-1);
-            sq.setY(sq.getY()+1);
-            }else if( direction == 3){
-            sq.setX(sq.getX()+1);
-            sq.setY(sq.getY()-1);
-            }else{
-            sq.setX(sq.getX()-1);
-            sq.setY(sq.getY()-1);
-        }
-            System.out.println(sq.toString());
+            sq.setX(sq.getX()+modx);
+            sq.setY(sq.getY()+mody);
+    
             if(sq.equals(blocker)){
                 return true;
             }
@@ -489,4 +567,11 @@ public class Pieces {
 
 return false;
     }
+    private static PColor pcolorOther(PColor color){
+        if (color == PColor.BLACK){
+            return PColor.WHITE;
+        }
+        return PColor.BLACK;
+    }
+    // no pins yet. Idea: change threats to piece so that if it detects same color piece to keep going. then if it encounters another piece of the same color end or diffenet color check if it can pin at that direction.
 }

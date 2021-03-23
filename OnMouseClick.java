@@ -5,7 +5,7 @@ import java.util.Iterator;
 public class OnMouseClick {
      static Square clickedSquare;
     static ArrayList<Square> squares;
-    static ArrayList<Square> threats;
+    static ArrayList<Square> threats,pinned,attackers;
     public static void click(Square square){
         
         Board.removeCircles(); //deletes everything in circBoxes
@@ -42,6 +42,34 @@ public class OnMouseClick {
                 }
                 
             }
+            //is a piece pinned?
+            if(pinned!=null&&!pinned.isEmpty()){
+                System.out.println("there is a pinned piece");
+                for(int i=0; i<pinned.size();i++){
+                    //is it the piece they clicked
+                    if(square.equals(pinned.get(i))){
+                        System.out.println("I am the pinned piece");
+                        Square curking;
+                   if(Main.curTurn == PColor.BLACK){
+                       curking = Board.bkinSquare;
+                   }else{
+                curking = Board.wKingSquare;
+            }
+                        Iterator<Square> iter = squares.iterator(); 
+                while(iter.hasNext()){
+                    System.out.println("what can I do");
+                    Square tmpS = iter.next();
+                    //if the move doesnt break the pin
+                    if(Pieces.pieceBlocks(curking, attackers.get(i), tmpS)||tmpS.equals(attackers.get(i))){
+                        continue;
+                    }
+                    iter.remove();
+                }
+
+                    }
+
+            }
+        }
             clickedSquare = square;
             for(Square s: squares){
                 if(Pieces.board[s.getX()][s.getY()]==null){
@@ -91,6 +119,8 @@ public class OnMouseClick {
                         }
                     }
                     //switch turns and update move order
+                    pinned = null;
+                    attackers = null;
                     if(Main.curTurn == PColor.WHITE){
                         Main.curTurn = PColor.BLACK;
                         Board.addToMoveOrder(PColor.WHITE, type, s,clickedSquare);
@@ -111,6 +141,7 @@ public class OnMouseClick {
                    //reset things
                     Pieces.board[clickedSquare.getX()][clickedSquare.getY()] = null;
                     squares = new ArrayList<>();
+                    
                     break;  
 
                 }
