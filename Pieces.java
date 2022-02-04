@@ -1,8 +1,4 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.text.Style;
 
 public class Pieces {
 
@@ -130,11 +126,11 @@ public class Pieces {
                 
             case BISHOP:
            
-                moveable = bishopMovment(square, p.color,true);
+                moveable = bishopMovment(square, p.color);
                 break;
             case QUEEN:
             moveable = rookMovement(square, p.color,true);
-            moveable.addAll(bishopMovment(square, p.color,true));
+            moveable.addAll(bishopMovment(square, p.color));
                 break;
             case KING:
             Square sq = new Square(square.getX(), square.getY() - 1);
@@ -196,20 +192,15 @@ public class Pieces {
         if(square.getX() > 7 || square.getY() > 7 || square.getX() < 0 || square.getY() < 0){
             return false;
         }
-        if((board[square.getX()][square.getY()] == null) || (board[square.getX()][square.getY()].color != taker)){
-            return true;
-        }
-        return false;
+        return ((board[square.getX()][square.getY()] == null) || (board[square.getX()][square.getY()].color != taker));
+        
     }
 
     public static boolean pawnCheckVertical(Square square){
         if(square.getX() > 7 || square.getY() > 7 || square.getX() < 0 || square.getY() < 0){
             return false;
         }
-        if(board[square.getX()][square.getY()] == null){
-            return true;
-        }
-        return false;
+        return (board[square.getX()][square.getY()] == null);
     }
 
     public static boolean pawnTakes(Square square, PColor taker){
@@ -426,97 +417,276 @@ public class Pieces {
         return moveable;
     }
 
-    private static ArrayList<Square> bishopMovment(Square square,PColor color,boolean movement){
+    // private static ArrayList<Square> bishopMovment(Square square,PColor color,boolean movement){
+    //     ArrayList<Square> moveable = new ArrayList<>();
+    //     int x = square.getX();
+    //     int y = square.getY();
+    //     int p = 0;
+    //     //right diags
+    //     boolean cntUp=true, cntDown=true;
+    //     for(int i = x+1;i<8;i++){
+    //         Square s = new Square(i,y+i-x);
+    //         Square s2 = new Square(i,y-i+x);
+        
+    //     if(cntDown){
+    //         if(checkIfMoveable(s, color)) {
+    //             if(movement){
+    //                 moveable.add(s);
+    //             }
+    //             if (board[s.getX()][s.getY()]!=null) {
+    //                 if(!movement) {
+    //                     moveable.add(s);
+    //                 }
+    //                 cntDown = false;
+    //             }
+                
+    //         }else{
+    //             cntDown = false;
+    //         }
+    //     }
+    //     if(cntUp){
+    //         if(checkIfMoveable(s2, color)){
+    //             if(movement){
+    //                 moveable.add(s2);
+    //             }
+    //             if (board[s2.getX()][s2.getY()]!=null){//////
+    //                 if(!movement){
+    //                     moveable.add(s2);
+    //                 }
+    //                 cntUp =false;
+    //             }
+               
+    //         }else{
+    //             if(movement || p == 1){
+    //                 cntUp=false;
+    //             } else {
+    //                 p++;
+    //             }
+    //         }
+    //     }
+    //     if (!cntUp&&!cntDown){break;}
+    //     }
+    // cntUp = true;
+    // cntDown = true;
+    //     //left diags
+    //     for(int i = x-1;i>=0;i--){
+    //         Square s = new Square(i,y+x-i);
+    //         Square s2 = new Square(i,y-x+i);
+        
+    //     if(cntDown){
+    //         if(checkIfMoveable(s, color)){
+    //             if(movement){
+    //                 moveable.add(s);
+    //             }
+    //             if (board[s.getX()][s.getY()]!=null){
+    //                 if(!movement){
+    //                     moveable.add(s);
+    //                 }
+    //                 cntDown =false;
+    //             }
+    //         }else{
+    //             cntDown=false;
+    //         }
+    //     }
+    //     if(cntUp){
+            
+    //         if(checkIfMoveable(s2, color)){
+    //             if(movement){
+    //                 moveable.add(s2);
+    //             }
+    //             if (board[s2.getX()][s2.getY()]!=null){
+    //                 if(!movement){
+    //                     moveable.add(s2);
+    //                 }
+    //                 cntUp =false;
+    //             }
+    //         }else{ 
+    //             cntUp=false;
+    //         }
+    //     }
+    //     if (!cntUp&&!cntDown){break;}
+    //     }
+    //     return moveable;
+    // }
+    private static ArrayList<Square> bishopMovment(Square square,PColor color){
         ArrayList<Square> moveable = new ArrayList<>();
         int x = square.getX();
         int y = square.getY();
-        //right diags
-        boolean cntUp=true, cntDown=true;
+        //up right
+        for(int i = x+1;i<8;i++){
+            Square s = new Square(i,y-i+x);
+            if(checkIfMoveable(s, color)){
+                moveable.add(s);
+                if (board[s.getX()][s.getY()]!=null) {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        // down right
         for(int i = x+1;i<8;i++){
             Square s = new Square(i,y+i-x);
-            Square s2 = new Square(i,y-i+x);
-        
-        if(cntDown){
             if(checkIfMoveable(s, color)){
-                if(movement){
                 moveable.add(s);
-            }
-                if (board[s.getX()][s.getY()]!=null){
-                    if(!movement){
-                        moveable.add(s);
-                    }
-                    cntDown =false;
+                if (board[s.getX()][s.getY()]!=null) {
+                    break;
                 }
-                
-            }else{
-                cntDown=false;
+            } else {
+                break;
             }
         }
-        if(cntUp){
-            if(checkIfMoveable(s2, color)){
-                if(movement){
-                    moveable.add(s2);
+        // up left
+        for(int i = x-1;i>=0;i--){
+            Square s = new Square(i,y-x+i);
+            if(checkIfMoveable(s, color)){
+                moveable.add(s);
+                if (board[s.getX()][s.getY()]!=null) {
+                    break;
                 }
-                if (board[s2.getX()][s2.getY()]!=null){//////
-                    if(!movement){
-                        moveable.add(s2);
-                    }
-                    cntUp =false;
-                }
-               
-            }else{
-                cntUp=false;
+            } else {
+                break;
             }
         }
-        if (!cntUp&&!cntDown){break;}
-        }
-    cntUp = true;
-    cntDown = true;
-        //left diags
+        // down left
         for(int i = x-1;i>=0;i--){
             Square s = new Square(i,y+x-i);
-            Square s2 = new Square(i,y-x+i);
-        
-        if(cntDown){
             if(checkIfMoveable(s, color)){
-                if(movement){
-                    moveable.add(s);
+                moveable.add(s);
+                if (board[s.getX()][s.getY()]!=null) {
+                    break;
                 }
-                if (board[s.getX()][s.getY()]!=null){
-                    if(!movement){
-                        moveable.add(s);
-                    }
-                    cntDown =false;
-                }
-            }else{
-                cntDown=false;
+            } else {
+                break;
             }
-        }
-        if(cntUp){
-            
-            if(checkIfMoveable(s2, color)){
-                if(movement){
-                    moveable.add(s2);
-                }
-                if (board[s2.getX()][s2.getY()]!=null){
-                    if(!movement){
-                        moveable.add(s2);
-                    }
-                    cntUp =false;
-                }
-            }else{ 
-                cntUp=false;
-            }
-        }
-        if (!cntUp&&!cntDown){break;}
         }
         return moveable;
+    }
+    private static ArrayList<Square> diagonalThreatsAndPins(Square square,PColor color){
+        ArrayList<Square> possibleThreats = new ArrayList<>();
+        int x = square.getX();
+        int y = square.getY();
+        boolean couldBePinned = false;
+        Square possiblePin =new Square();
+        Square possibleAttacker =new Square();
+        //up right
+        for(int i = x+1;i<8;i++){
+            Square s = new Square(i,y-i+x);
+            if(checkIfMoveable(s, color)){
+                if (board[s.getX()][s.getY()] != null) {
+                    if (!couldBePinned){
+                    possibleThreats.add(s);
+                    break;
+                    }else{
+                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
+                            System.out.println("I'm pinned down diagonally!");
+                            s.copy(possibleAttacker);
+                            OnMouseClick.pinned.add(possiblePin);
+                            OnMouseClick.attackers.add(possibleAttacker);
+                        }
+                    }
+                }
+            } else {
+                if (couldBePinned){
+                    break;
+                } else {
+                    couldBePinned = true;
+                    possiblePin = s;
+                }
+                
+            }
+        }
+        couldBePinned = false;
+        // down right
+        for(int i = x+1;i<8;i++){
+            Square s = new Square(i,y+i-x);
+            if(checkIfMoveable(s, color)){
+                if (board[s.getX()][s.getY()] != null) {
+                    if (!couldBePinned){
+                    possibleThreats.add(s);
+                    break;
+                    }else{
+                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
+                            System.out.println("I'm pinned down diagonally!");
+                            s.copy(possibleAttacker);
+                            OnMouseClick.pinned.add(possiblePin);
+                            OnMouseClick.attackers.add(possibleAttacker);
+                        }
+                    }
+                }
+            } else {
+                if (couldBePinned){
+                    break;
+                } else {
+                    couldBePinned = true;
+                    possiblePin = s;
+                }
+                
+            }
+        }
+        couldBePinned = false;
+        // up left
+        for(int i = x-1;i>=0;i--){
+            Square s = new Square(i,y-x+i);
+            if(checkIfMoveable(s, color)){
+                if (board[s.getX()][s.getY()] != null) {
+                    if (!couldBePinned){
+                    possibleThreats.add(s);
+                    break;
+                    }else{
+                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
+                            System.out.println("I'm pinned down diagonally!");
+                            s.copy(possibleAttacker);
+                            OnMouseClick.pinned.add(possiblePin);
+                            OnMouseClick.attackers.add(possibleAttacker);
+                        }
+                    }
+                }
+            } else {
+                if (couldBePinned){
+                    break;
+                } else {
+                    couldBePinned = true;
+                    possiblePin = s;
+                }
+                
+            }
+        }
+        couldBePinned = false;
+        // down left
+        for(int i = x-1;i>=0;i--){
+            Square s = new Square(i,y+x-i);
+            if(checkIfMoveable(s, color)){
+                if (board[s.getX()][s.getY()] != null) {
+                    if (!couldBePinned){
+                    possibleThreats.add(s);
+                    break;
+                    }else{
+                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
+                            System.out.println("I'm pinned down diagonally!");
+                            s.copy(possibleAttacker);
+                            OnMouseClick.pinned.add(possiblePin);
+                            OnMouseClick.attackers.add(possibleAttacker);
+                        }
+                    }
+                }
+            } else {
+                if (couldBePinned){
+                    break;
+                } else {
+                    couldBePinned = true;
+                    possiblePin = s;
+                }
+                
+            }
+        }
+        return possibleThreats;
     }
     public static ArrayList<Square> threatsToPiece(PColor color,Square square){
         OnMouseClick.pinned = new ArrayList<>();
         OnMouseClick.attackers = new ArrayList<>();
         ArrayList<Square> rookThreats = rookMovement(square, color, false);
-        ArrayList<Square> diagnalThreats = bishopMovment(square, color, false);
+        ArrayList<Square> diagnalThreats = diagonalThreatsAndPins(square, color);
         ArrayList<Square> attackers= knightMovement(square, color, false);
         for(Square s: rookThreats){
             if(board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.ROOK){
@@ -525,7 +695,9 @@ public class Pieces {
 
         }
         for(Square s: diagnalThreats){
+            System.out.print("diag threat, "+s.getX()+", "+ s.getY());
             if(board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.BISHOP||board[s.getX()][s.getY()].type==PType.PAWN){
+                System.out.println(" from a " +board[s.getX()][s.getY()].color +" "+ board[s.getX()][s.getY()].type);
                 attackers.add(s);
             }
 

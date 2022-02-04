@@ -1,1 +1,1 @@
-1.e4 e5 2.nf3 nf6 3.nxe5 nc6 4.nxc6 dxc6 5.d3 bxc5 6.be2 h5 
+1.e4 e5 2.nf3 bc5 3.nxe5 d6 4.bc4 nf6 5.O-O 

@@ -11,60 +11,61 @@ public class OnMouseClick {
         Board.removeCircles(); //deletes everything in circBoxes
 
         // if they clicked on their own piece
-        if(Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].color == Main.curTurn){
+        if (Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].color == Main.curTurn) {
             squares = Pieces.movement(square);
             //if the king is under attack
-            if(threats!=null&&!threats.isEmpty()&&Pieces.board[square.getX()][square.getY()].type != PType.KING){
+            if (threats!=null && !threats.isEmpty() && Pieces.board[square.getX()][square.getY()].type != PType.KING) {
                 //by one attacker
                if (threats.size()==1){
 
                    Square curking;
-                   if(Main.curTurn == PColor.BLACK){
+                   if(Main.curTurn == PColor.BLACK) {
                        curking = Board.bkinSquare;
-                   }else{
+                   } else {
                 curking = Board.wKingSquare;
-            }
-                boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].type==PType.KING);
+                    }
+                boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].type==PType.KNIGHT);
                 Iterator<Square> iter = squares.iterator(); 
                 while(iter.hasNext()){
                     Square tmpS = iter.next();
-                    if(tmpS.equals(threats.get(0))||(!isKnight&&Pieces.pieceBlocks(curking,threats.get(0),tmpS))){
+                    // if it can take the piece that put it in check or that piece blocks the check
+                    if(tmpS.equals(threats.get(0)) || (!isKnight && Pieces.pieceBlocks(curking,threats.get(0),tmpS))){
                         continue;
                     }
                     iter.remove();
                 }
                 }else{
-                    if(!square.equals(Board.bkinSquare)&&!square.equals(Board.wKingSquare)){
-                        for(int i =0;i<squares.size();i++){
-                        squares.remove(i);
-                    }
+                    if(!square.equals(Board.bkinSquare) && !square.equals(Board.wKingSquare)){
+                        for(int i = 0; i<squares.size(); i++){
+                            squares.remove(i);
+                        }
                     }
                 }
                 
             }
             //is a piece pinned?
-            if(pinned!=null&&!pinned.isEmpty()){
+            if(pinned != null && !pinned.isEmpty()){
                 System.out.println("there is a pinned piece");
                 for(int i=0; i<pinned.size();i++){
                     //is it the piece they clicked
                     if(square.equals(pinned.get(i))){
                         System.out.println("I am the pinned piece");
                         Square curking;
-                   if(Main.curTurn == PColor.BLACK){
-                       curking = Board.bkinSquare;
-                   }else{
-                curking = Board.wKingSquare;
-            }
+                         if(Main.curTurn == PColor.BLACK){
+                            curking = Board.bkinSquare;
+                        }else{
+                            curking = Board.wKingSquare;
+                             }       
                         Iterator<Square> iter = squares.iterator(); 
-                while(iter.hasNext()){
-                    System.out.println("what can I do");
-                    Square tmpS = iter.next();
-                    //if the move doesnt break the pin
-                    if(Pieces.pieceBlocks(curking, attackers.get(i), tmpS)||tmpS.equals(attackers.get(i))){
-                        continue;
-                    }
-                    iter.remove();
-                }
+                        while(iter.hasNext()){
+                        System.out.println("what can I do");
+                        Square tmpS = iter.next();
+                        //if the move doesnt break the pin
+                        if(Pieces.pieceBlocks(curking, attackers.get(i), tmpS) || tmpS.equals(attackers.get(i))){
+                            continue;
+                        }
+                        iter.remove();
+                        }   
 
                     }
 
@@ -126,7 +127,7 @@ public class OnMouseClick {
                         Board.addToMoveOrder(PColor.WHITE, type, s,clickedSquare);
                         //king in check?
                          threats = Pieces.threatsToPiece(PColor.BLACK, Board.bkinSquare);
-                        for(Square t:threats){
+                        for(Square t:threats) {
                             System.out.println(t.toString());
                         }
                     }else{
@@ -142,6 +143,11 @@ public class OnMouseClick {
                     Pieces.board[clickedSquare.getX()][clickedSquare.getY()] = null;
                     squares = new ArrayList<>();
                     
+                    System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
+                    System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
+                    System.out.println("black can castle long " + Pieces.blackCanCastleLong);
+                    System.out.println("black can castle short " + Pieces.blackCanCastleShort);
+
                     break;  
 
                 }
