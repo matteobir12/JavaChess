@@ -125,11 +125,11 @@ public class Pieces {
                 break;
                 
             case BISHOP:
-                moveable = bishopMovment(square, p.color);
+                moveable = bishopMovement(square, p.color);
                 break;
             case QUEEN:
             moveable = rookMovement(square, p.color);
-            moveable.addAll(bishopMovment(square, p.color));
+            moveable.addAll(bishopMovement(square, p.color));
                 break;
             case KING:
             Square sq = new Square(square.getX(), square.getY() - 1);
@@ -336,49 +336,28 @@ public class Pieces {
         return null;
     }
 
-    private static ArrayList<Square> bishopMovment(Square square,PColor color){
+    private static ArrayList<Square> bishopMovement(Square square,PColor color){
+        ArrayList<Square> moveable = new ArrayList<>();
+        //up right i = x+1;i<8;i++ new Square(i,y-i+x)
+        moveable.addAll(bishopMovementHelper(square, color, true, true));
+        // down right i = x+1;i<8;i++ new Square(i,y+i-x)
+        moveable.addAll(bishopMovementHelper(square, color, true, false));
+        // up left i = x-1 i>=0 i-- new Square(i,y-x+i)
+        moveable.addAll(bishopMovementHelper(square, color, false, true));
+        // down left i = x-1 i>=0 i-- new Square(i,y+x-i)
+        moveable.addAll(bishopMovementHelper(square, color, false, false));
+        return moveable;
+    }
+    private static ArrayList<Square> bishopMovementHelper(Square square, PColor color, boolean right, boolean up){
         ArrayList<Square> moveable = new ArrayList<>();
         int x = square.getX();
         int y = square.getY();
-        //up right
-        for(int i = x+1;i<8;i++){
-            Square s = new Square(i,y-i+x);
-            if(checkIfMoveable(s, color)){
-                moveable.add(s);
-                if (board[s.getX()][s.getY()]!=null) {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-        // down right
-        for(int i = x+1;i<8;i++){
-            Square s = new Square(i,y+i-x);
-            if(checkIfMoveable(s, color)){
-                moveable.add(s);
-                if (board[s.getX()][s.getY()]!=null) {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-        // up left
-        for(int i = x-1;i>=0;i--){
-            Square s = new Square(i,y-x+i);
-            if(checkIfMoveable(s, color)){
-                moveable.add(s);
-                if (board[s.getX()][s.getY()]!=null) {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-        // down left
-        for(int i = x-1;i>=0;i--){
-            Square s = new Square(i,y+x-i);
+        int xDiff = -1;
+        int yDiff = -1;
+        if (right) xDiff = 1;
+        if (up) yDiff = 1;
+        for(int i = x+xDiff;i>=0 && i < 8;i+=xDiff) {
+            Square s = new Square(i,y+(x*yDiff)-(i*yDiff));
             if(checkIfMoveable(s, color)){
                 moveable.add(s);
                 if (board[s.getX()][s.getY()]!=null) {
@@ -390,6 +369,7 @@ public class Pieces {
         }
         return moveable;
     }
+
     private static ArrayList<Square> diagonalThreatsAndPins(Square square, PColor color, ArrayList<Square> pinners, ArrayList<Square> pins){
         ArrayList<Square> possibleThreats = new ArrayList<>();
         //up right i = x+1;i<8;i++ new Square(i,y-i+x)

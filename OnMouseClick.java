@@ -18,14 +18,13 @@ public class OnMouseClick {
             //if the king is under attack
             if (threats!=null && !threats.isEmpty() && Pieces.board[square.getX()][square.getY()].type != PType.KING) {
                 //by one attacker
-               if (threats.size()==1){
-
-                   Square curking;
-                   if(Main.curTurn == PColor.BLACK) {
-                       curking = Board.bkinSquare;
-                   } else {
-                curking = Board.wKingSquare;
-                    }
+                if (threats.size()==1){
+                    Square curking;
+                    if(Main.curTurn == PColor.BLACK) {
+                        curking = Board.bkinSquare;
+                    } else {
+                    curking = Board.wKingSquare;
+                }
                 boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].type==PType.KNIGHT);
                 Iterator<Square> iter = squares.iterator(); 
                 while(iter.hasNext()){
@@ -51,17 +50,17 @@ public class OnMouseClick {
                     //is it the piece they clicked
                     if(square.equals(pinned.get(i))){
                         Square curking;
-                         if(Main.curTurn == PColor.BLACK){
+                        if(Main.curTurn == PColor.BLACK){
                             curking = Board.bkinSquare;
                         }else{
                             curking = Board.wKingSquare;
-                             }       
+                        }       
                         Iterator<Square> iter = squares.iterator(); 
                         while(iter.hasNext()){
-                        Square tmpS = iter.next();
-                        //if the move doesnt break the pin
-                        if(Pieces.pieceBlocks(curking, pinners.get(i), tmpS) || tmpS.equals(pinners.get(i))){
-                            continue;
+                            Square tmpS = iter.next();
+                            //if the move doesnt break the pin
+                            if(Pieces.pieceBlocks(curking, pinners.get(i), tmpS) || tmpS.equals(pinners.get(i))){
+                                continue;
                         }
                         iter.remove();
                         }   
@@ -73,7 +72,7 @@ public class OnMouseClick {
             clickedSquare = square;
             for(Square s: squares){
                 if(Pieces.board[s.getX()][s.getY()]==null){
-                Board.displayPossibleMoves(s);
+                    Board.displayPossibleMoves(s);
             }else{
                 
             }
@@ -104,9 +103,8 @@ public class OnMouseClick {
 
                     //if king moved test if it was a castle and move the rook too. also update the king square.
                     if(type.charAt(2)=='n'){
-                        
                         if(Pieces.board[clickedSquare.getX()][clickedSquare.getY()].color == PColor.BLACK){
-                        Board.bkinSquare = new Square(clickedSquare.getX(), clickedSquare.getY());
+                            Board.bkinSquare = new Square(clickedSquare.getX(), clickedSquare.getY());
                         if (Pieces.blackCanCastleLong||Pieces.blackCanCastleShort){
                             Board.castle(color, clickedSquare, square);
                         }
@@ -118,6 +116,9 @@ public class OnMouseClick {
                             }
                         }
                     }
+                    //reset things
+                    Pieces.board[clickedSquare.getX()][clickedSquare.getY()] = null;
+                    squares = new ArrayList<>();
                     //switch turns and update move order
                     pinned = new ArrayList<>();
                     pinners = new ArrayList<>();
@@ -131,10 +132,10 @@ public class OnMouseClick {
                             System.out.println("Black is in check from " + t.toString());
                         }
                         for(Square p:pinners) {
-                            System.out.println("Black is pinned check from " + p.toString());
+                            System.out.println("Black is pinned from " + p.toString());
                         }
                         for(Square p:pinned) {
-                            System.out.println("White is pinned on " + p.toString());
+                            System.out.println("Black is pinned on " + p.toString());
                         }
                     }else{
                         Main.curTurn = PColor.WHITE;
@@ -152,10 +153,6 @@ public class OnMouseClick {
                             System.out.println("White is pinned on " + p.toString());
                         }
                     }
-
-                   //reset things
-                    Pieces.board[clickedSquare.getX()][clickedSquare.getY()] = null;
-                    squares = new ArrayList<>();
                     
                     // System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
                     // System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
