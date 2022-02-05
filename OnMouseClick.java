@@ -64,11 +64,9 @@ public class OnMouseClick {
                         }
                         iter.remove();
                         }   
-
                     }
-
+                }
             }
-        }
             clickedSquare = square;
             for(Square s: squares){
                 if(Pieces.board[s.getX()][s.getY()]==null){
@@ -89,36 +87,21 @@ public class OnMouseClick {
                         Board.ex = true;
                     }
                     Board.removeCircles();
-
-                    // change board in pieces
+                    
+                    // change board in pieces clickedSquare is old square s is new square
                     String string = "./assets/";
                     String color = Pieces.board[clickedSquare.getX()][clickedSquare.getY()].color.toString().toLowerCase();////
+                    Board.afterMove(clickedSquare, s, color);
                     String type = Pieces.board[clickedSquare.getX()][clickedSquare.getY()].type.toString().toLowerCase();
                     JLabel l = new JLabel(new ImageIcon(string+color+"_"+type+".png"));
                     Pieces.board[s.getX()][s.getY()] = Pieces.board[clickedSquare.getX()][clickedSquare.getY()];
                     Pieces.board[s.getX()][s.getY()].label = l;
                     Board.boardPanel[s.getX()][s.getY()].add(l);
-                    
-                    
 
-                    //if king moved test if it was a castle and move the rook too. also update the king square.
-                    if(type.charAt(2)=='n'){
-                        if(Pieces.board[clickedSquare.getX()][clickedSquare.getY()].color == PColor.BLACK){
-                            Board.bkinSquare = new Square(clickedSquare.getX(), clickedSquare.getY());
-                        if (Pieces.blackCanCastleLong||Pieces.blackCanCastleShort){
-                            Board.castle(color, clickedSquare, square);
-                        }
-                    }
-                        if(Pieces.board[clickedSquare.getX()][clickedSquare.getY()].color == PColor.WHITE ){
-                            Board.bkinSquare = new Square(clickedSquare.getX(), clickedSquare.getY());
-                            if(Pieces.whiteCanCastleLong||Pieces.whiteCanCastleShort){
-                                Board.castle(color, clickedSquare, square);
-                            }
-                        }
-                    }
                     //reset things
                     Pieces.board[clickedSquare.getX()][clickedSquare.getY()] = null;
                     squares = new ArrayList<>();
+                    
                     //switch turns and update move order
                     pinned = new ArrayList<>();
                     pinners = new ArrayList<>();
@@ -141,7 +124,7 @@ public class OnMouseClick {
                         Main.curTurn = PColor.WHITE;
                         Board.addToMoveOrder(PColor.BLACK, type, s,clickedSquare);
                         //assessing threats to white king
-                        System.out.println("assessing threats to black king");
+                        System.out.println("assessing threats to whites king");
                         threats = Pieces.threatsToPiece(PColor.WHITE, Board.wKingSquare,pinners,pinned);
                         for(Square t:threats){
                             System.out.println("White is in check from " + t.toString());
@@ -164,7 +147,6 @@ public class OnMouseClick {
                 }
             }
         }
-        Board.updateBoard();
-    
+        Board.updateBoard();    
     }
 }

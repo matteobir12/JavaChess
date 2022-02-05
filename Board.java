@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 
 
 
-public class Board { //notice implements ActionListener
+public class Board {
     static int h = 1000;
     static int l = 1000;
     static int moveNumb = 1;
@@ -190,6 +190,42 @@ public class Board { //notice implements ActionListener
        
         
     }
+    public static void afterMove(Square pieceOldSquare, Square pieceNewSquare, String color){
+        //if king moved test if it was a castle and move the rook too. also update the king square.
+        if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type==PType.KING){
+            if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].color == PColor.BLACK){
+                bkinSquare = new Square(pieceOldSquare.getX(), pieceOldSquare.getY());
+                if (Pieces.blackCanCastleLong||Pieces.blackCanCastleShort){
+                    castle(color, pieceOldSquare, pieceNewSquare);
+                }
+            }
+            if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].color == PColor.WHITE ){
+                bkinSquare = new Square(pieceOldSquare.getX(), pieceOldSquare.getY());
+                if(Pieces.whiteCanCastleLong||Pieces.whiteCanCastleShort){
+                    castle(color, pieceOldSquare, pieceNewSquare);
+                }
+            }
+        } 
+        //if a rook was moved check if we want to stop castling
+        if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type == PType.ROOK){
+            noCastle(pieceOldSquare);
+        }
+        // if we just enpassented
+        if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type == PType.PAWN && pieceOldSquare.getX()!=pieceNewSquare.getX() && Pieces.board[pieceNewSquare.getX()][pieceNewSquare.getY()] == null){
+            Container parent = Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()].label.getParent();
+            if(parent!=null){
+                parent.remove(Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()].label);
+            }
+            //remove pawn
+            Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()] = null;
+        }
+        Pieces.setEnPassentable(null);
+        if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type == PType.PAWN && (pieceNewSquare.getY()==pieceOldSquare.getY() + 2 || pieceNewSquare.getY()==pieceOldSquare.getY() - 2)){
+            System.out.println(pieceNewSquare.toString() + " pessanable");
+            Pieces.setEnPassentable(pieceNewSquare);
+        }
+    }
+
     static void castle(String color,Square clickedSquare,Square square) {
         String string = "./assets/";
         JLabel lab = new JLabel(new ImageIcon(string+color+"_rook.png"));
@@ -220,6 +256,22 @@ public class Board { //notice implements ActionListener
             Pieces.board[5][square.getY()].label = lab;
             Board.boardPanel[5][square.getY()].add(lab);
             Pieces.board[7][square.getY()] = null;
+        }
+    }
+    private static void noCastle(Square square){
+        if(square.getX() == 0){
+            if(Pieces.board[square.getX()][square.getY()].color == PColor.WHITE){
+                Pieces.whiteCanCastleLong = false;
+            }else{
+                Pieces.blackCanCastleLong = false;
+            }
+        }
+        if(square.getX()==7){
+            if(Pieces.board[square.getX()][square.getY()].color == PColor.WHITE){
+                Pieces.whiteCanCastleShort = false;
+            }else{
+                Pieces.blackCanCastleShort = false;
+            }
         }
     }
 

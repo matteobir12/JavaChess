@@ -1,12 +1,11 @@
 import java.util.ArrayList;
 
-import javax.swing.plaf.multi.MultiViewportUI;
-
 public class Pieces {
 
     public static Piece[][] board = new Piece[8][8];
     static boolean whiteCanCastleShort, whiteCanCastleLong;
     static boolean blackCanCastleShort, blackCanCastleLong;
+    private static Square enPassentable;
     
     /*{{Piece.BLACK_ROOK, Piece.BLACK_KNIGHT, Piece.BLACK_BISHOP, Piece.BLACK_QUEEN, Piece.BLACK_KING, Piece.BLACK_BISHOP, Piece.BLACK_KNIGHT, Piece.BLACK_ROOK},
         {Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN, Piece.BLACK_PAWN},
@@ -81,6 +80,15 @@ public class Pieces {
                     if(pawnTakes(s, PColor.WHITE)){
                         moveable.add(s);
                     }
+                    if(enPassentable != null && enPassentable.getY()==square.getY()){
+                        if(enPassentable.getX() == square.getX() - 1){
+                            s = new Square(square.getX() - 1,square.getY() - 1);
+                            moveable.add(s);
+                        }else if(enPassentable.getX() == square.getX() + 1) {
+                            s = new Square(square.getX() + 1,square.getY() - 1);
+                            moveable.add(s);
+                        }
+                    }
                 }
                 else if(p.color == PColor.BLACK){
                     Square s = new Square(square.getX(), square.getY() + 1);
@@ -101,23 +109,21 @@ public class Pieces {
                     if(pawnTakes(s, PColor.BLACK)){
                         moveable.add(s);
                     }
+                    if(enPassentable != null && enPassentable.getY()==square.getY()){
+                        if(enPassentable.getX() == square.getX() - 1){
+                            s = new Square(square.getX() - 1,square.getY() + 1);
+                            moveable.add(s);
+                        }else if(enPassentable.getX() == square.getX() + 1) {
+                            s = new Square(square.getX() + 1,square.getY() + 1);
+                            moveable.add(s);
+                        }
+                        
+                        
+                        
+                    }
                 }
                 break;
             case ROOK:
-                if(square.getX() == 0){
-                    if(board[square.getX()][square.getY()].color == PColor.WHITE){
-                        whiteCanCastleLong = false;
-                    }else{
-                    blackCanCastleLong = false;
-                }
-                }
-                if(square.getX()==7){
-                    if(board[square.getX()][square.getY()].color == PColor.WHITE){
-                        whiteCanCastleShort = false;
-                    }else{
-                    blackCanCastleShort = false;
-                }
-                }
                 moveable = rookMovement(square, p.color);
                 break;
             case KNIGHT:
@@ -466,5 +472,10 @@ return false;
         }
         return PColor.BLACK;
     }
-    // no pins yet. Idea: change threats to piece so that if it detects same color piece to keep going. then if it encounters another piece of the same color end or diffenet color check if it can pin at that direction.
+  public static void setEnPassentable(Square enPassentable) {
+      Pieces.enPassentable = enPassentable;
+  }
+  public static Square getEnPassentable() {
+      return enPassentable;
+  }
 }
