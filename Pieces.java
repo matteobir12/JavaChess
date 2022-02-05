@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import javax.swing.plaf.multi.MultiViewportUI;
+
 public class Pieces {
 
     public static Piece[][] board = new Piece[8][8];
@@ -116,72 +118,67 @@ public class Pieces {
                     blackCanCastleShort = false;
                 }
                 }
-                moveable = rookMovement(square, p.color,true);
+                moveable = rookMovement(square, p.color);
                 break;
             case KNIGHT:
-            
                 moveable = knightMovement(square,p.color,true);
-
                 break;
                 
             case BISHOP:
-           
                 moveable = bishopMovment(square, p.color);
                 break;
             case QUEEN:
-            moveable = rookMovement(square, p.color,true);
+            moveable = rookMovement(square, p.color);
             moveable.addAll(bishopMovment(square, p.color));
                 break;
             case KING:
             Square sq = new Square(square.getX(), square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY());
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX(), square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() - 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() - 1, square.getY());
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() -1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq).isEmpty()){
+                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 if(board[square.getX()][square.getY()].color == PColor.WHITE){
-                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null&&threatsToPiece(p.color, new Square(2, 7)).isEmpty()&&threatsToPiece(p.color, new Square(1, 7)).isEmpty()&&threatsToPiece(p.color, new Square(3, 7)).isEmpty()&&OnMouseClick.threats.isEmpty()){
+                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null&&threatsToPiece(p.color, new Square(2, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(1, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(3, 7),null,null).isEmpty()&&OnMouseClick.threats.isEmpty()){
                       moveable.add(new Square(2, 7));
                     }
-                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null&&threatsToPiece(p.color, new Square(5, 7)).isEmpty()&&threatsToPiece(p.color, new Square(6, 7)).isEmpty()&&OnMouseClick.threats.isEmpty()){
+                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null&&threatsToPiece(p.color, new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(6, 7),null,null).isEmpty()&&OnMouseClick.threats.isEmpty()){
                       moveable.add(new Square(6, 7));
                     }
                   }else{
-                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(3, 0)).isEmpty()&&threatsToPiece(p.color, new Square(2, 0)).isEmpty()&&threatsToPiece(p.color, new Square(1, 0)).isEmpty()){
+                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(3, 0),null,null).isEmpty()&&threatsToPiece(p.color, new Square(2, 0),null,null).isEmpty()&&threatsToPiece(p.color, new Square(1, 0),null,null).isEmpty()){
                           moveable.add(new Square(2, 0));
                         }
-                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(5, 7)).isEmpty()&&threatsToPiece(p.color, new Square(6, 7)).isEmpty()){
+                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(6, 7),null,null).isEmpty()) {
                           moveable.add(new Square(6, 0));
                         }
-                  
               }
-
                 break;
         }
         
@@ -250,173 +247,258 @@ public class Pieces {
                 return moveable;
     }
     
-
-    private static ArrayList<Square> rookMovement(Square square,PColor color,boolean movement){
+    /**
+     * 
+     * @param square
+     * @param color
+     * @param movement
+     * @return
+     */
+    private static ArrayList<Square> rookMovement(Square square,PColor color){
         ArrayList<Square> moveable = new ArrayList<>();
-        int x = square.getX();
-        int y = square.getY();
-        int p =0;
-        Square possibleAttacker =new Square();
-        Square possiblePin =new Square();
-        //y down
-        for(int i = y+1;i<8;i++){
-            Square s = new Square(x,i);
-            if(!checkIfMoveable(s, color)){
-               if(!movement&&checkIfMoveable(s, pcolorOther(color))){
-                if(p==1){
-                    System.out.println("nothing to report");
-                    break;
-                }
-                p++;
-                s.copy(possiblePin);
-                continue;
-               }
-
-                break;
-            }else{
-                if(movement){
-                    moveable.add(s);
-                    }
-                if (board[x][i]!=null){
-                    if(!movement){
-                        if(p==0){
-                        moveable.add(s);}
-                        else{
-                            //if we are in "pin mode" and its a piece that can pin 
-                            System.out.println("hold on I got something");
-                            if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
-                                System.out.println("I'm pinned down!");
-                                s.copy(possibleAttacker);
-                                OnMouseClick.pinned.add(possiblePin);
-                                OnMouseClick.attackers.add(possibleAttacker);
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        //y up
-        if(!movement){
-        p=0;
-        possibleAttacker =new Square();
-         possiblePin =new Square();
-    }
-        for(int i =y-1;i>=0;i--){
-            Square s = new Square(x,i);
-            if(!checkIfMoveable(s, color)){
-                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
-                    if(p==1){
-                        break;
-                    }
-                    p++;
-                    s.copy(possiblePin);
-                    continue;
-                   }
-                break;
-            }else{
-                if(movement){
-                moveable.add(s);
-                }
-                if (board[x][i]!=null){
-                    if(!movement){
-                        if(p==0){
-                            moveable.add(s);}
-                            else{
-                                //if we are in "pin mode" and its a piece that can pin 
-                                if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
-                                    s.copy(possibleAttacker);
-                                    OnMouseClick.pinned.add(possiblePin);
-                                    OnMouseClick.attackers.add(possibleAttacker);
-                                }
-                            }
-                    }
-                    break;
-                }
-            }
-        }
-//x right
-        if(!movement){
-            p=0;
-            possibleAttacker =new Square();
-            possiblePin =new Square();
-        }
-        for(int i =x+1;i<8;i++){
-            Square s = new Square(i,y);
-            if(!checkIfMoveable(s, color)){
-                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
-                    if(p==1){
-                        break;
-                    }
-                    p++;
-                    s.copy(possiblePin);
-                    continue;
-                   }
-                break;
-            }else{
-                if(movement){
-                    moveable.add(s);
-                    }
-                if (board[i][y]!=null){
-                    if(!movement){
-                        if(p==0){
-                            moveable.add(s);}
-                            else{
-                                //if we are in "pin mode" and its a piece that can pin 
-                                if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
-                                    s.copy(possibleAttacker);
-                                    OnMouseClick.pinned.add(possiblePin);
-                                    OnMouseClick.attackers.add(possibleAttacker);
-                                }
-                            }
-                    }
-                    break;
-                }
-            }
-        }
-        //x left
-        if(!movement){
-            p=0;
-            possibleAttacker =new Square();
-             possiblePin =new Square();
-        }
-        for(int i =x-1;i>=0;i--){
-            Square s = new Square(i,y);
-            if(!checkIfMoveable(s, color)){
-                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
-                    if(p==1){
-                        break;
-                    }
-                    p++;
-                    s.copy(possiblePin);
-                    continue;
-                   }
-                break;
-            }else{
-                if(movement){
-                    moveable.add(s);
-                    }
-                if (board[i][y]!=null){
-                    if(!movement){
-                        if(p==0){
-                            moveable.add(s);}
-                            else{
-                                //if we are in "pin mode" and its a piece that can pin 
-                                if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
-                                    s.copy(possibleAttacker);
-                                    OnMouseClick.pinned.add(possiblePin);
-                                    OnMouseClick.attackers.add(possibleAttacker);
-                                }
-                            }
-                    }
-                    break;
-                }
-            }
-            
-        }
+        //y down (int i = y+1;i<8;i++) new Square(x,i)
+        moveable.addAll(rookMovementHelper(square, color, false, false));
+        //y up (int i =y-1;i>=0;i--) new Square(x,i)
+        moveable.addAll(rookMovementHelper(square, color, false, true));
+        //x right (int i =x+1;i<8;i++) new Square(i,y)
+        moveable.addAll(rookMovementHelper(square, color, true, false));
+        //x left (int i =x-1;i>=0;i--) new Square(i,y)
+        moveable.addAll(rookMovementHelper(square, color, true, true));
         return moveable;
     }
 
+    private static ArrayList<Square> rookMovementHelper(Square square,PColor color, boolean xDirection, boolean negative) {
+        ArrayList<Square> moveable = new ArrayList<>();
+        int x = square.getX();
+        int y = square.getY();
+        int diff = 1;
+        if (negative) diff = -1;
+        int direction = y;
+        if (xDirection) direction = x;
+        for(int i = direction+diff;0<=i && i<8;i+=diff){
+            Square s = new Square(!xDirection ? x :i, xDirection ? y :i);
+            if(!checkIfMoveable(s, color)){
+                break;
+            }else{
+                moveable.add(s);
+                if (board[!xDirection ? x :i][xDirection ? y :i]!=null){
+                    break;
+                }
+            }
+        }
+        return moveable;
+    }
+    private static ArrayList<Square> veticalNHorizontalThreats(Square square,PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned){
+        ArrayList<Square> moveable = new ArrayList<>();
+        //y down (int i = y+1;i<8;i++) new Square(x,i)
+        Square yd = veticalNHorizontalThreatsHelper(square, color, false, false, pinners, pinned);
+        if (yd != null) moveable.add(yd);
+        //y up (int i =y-1;i>=0;i--) new Square(x,i)
+        Square yu = veticalNHorizontalThreatsHelper(square, color, false, true, pinners, pinned);
+        if (yu != null) moveable.add(yu);
+        //x right (int i =x+1;i<8;i++) new Square(i,y)
+        Square xr = veticalNHorizontalThreatsHelper(square, color, true, false, pinners, pinned);
+        if (xr != null) moveable.add(xr);
+        //x left (int i =x-1;i>=0;i--) new Square(i,y)
+        Square xl = veticalNHorizontalThreatsHelper(square, color, true, true, pinners, pinned);
+        if (xl != null) moveable.add(xl);
+        return moveable;
+    }
+    private static Square veticalNHorizontalThreatsHelper(Square square, PColor color, boolean xDirection, boolean negative, ArrayList<Square> pinners, ArrayList<Square> pinned) {
+        int x = square.getX();
+        int y = square.getY();
+        Square possiblePin = null;
+        int diff = 1;
+        if (negative) diff = -1;
+        int direction = y;
+        if (xDirection) direction = x;
+        for(int i = direction+diff;0<=i && i<8; i+=diff){
+            Square s = new Square(!xDirection ? x :i, xDirection ? y :i);
+            //is empty or of opposite color
+            if(checkIfMoveable(s, color)) {
+                // check if its not empty and if the piece is a queen or rook
+                if (board[s.getX()][s.getY()]!=null && (board[s.getX()][s.getY()].type == PType.QUEEN||board[s.getX()][s.getY()].type == PType.ROOK)) {
+                        if (possiblePin != null) { 
+                            pinned.add(possiblePin);
+                            if (pinners != null) pinners.add(s);
+                            return null;
+                        }
+                        return s;
+                }
+            //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
+            }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
+                possiblePin = s;
+            //walked out of bounds
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+//     private static ArrayList<Square> straightLineThreats(Square square, PColor color, boolean movement, ArrayList<Square> pinners, ArrayList<Square> pins){
+//         ArrayList<Square> moveable = new ArrayList<>();
+//         int x = square.getX();
+//         int y = square.getY();
+//         int p =0;
+//         Square possibleAttacker =new Square();
+//         Square possiblePin =new Square();
+//         //y down
+//         for(int i = y+1;i<8;i++){
+//             Square s = new Square(x,i);
+//             if(!checkIfMoveable(s, color)){
+//                if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+//                 if(p==1){
+//                     System.out.println("nothing to report");
+//                     break;
+//                 }
+//                 p++;
+//                 s.copy(possiblePin);
+//                 continue;
+//                }
+//                 break;
+//             }else{
+//                 if(movement){
+//                     moveable.add(s);
+//                     }
+//                 if (board[x][i]!=null){
+//                     if(!movement){
+//                         if(p==0){
+//                         moveable.add(s);}
+//                         else{
+//                             //if we are in "pin mode" and its a piece that can pin 
+//                             System.out.println("hold on I got something");
+//                             if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+//                                 System.out.println("I'm pinned down!");
+//                                 s.copy(possibleAttacker);
+//                                 if(pins !=null) pins.add(possiblePin);
+//                                 if(attackers !=null) attackers.add(possibleAttacker);
+//                             }
+//                         }
+//                     }
+//                     break;
+//                 }
+//             }
+//         }
+//         //y up
+//         if(!movement){
+//         p=0;
+//         possibleAttacker =new Square();
+//          possiblePin =new Square();
+//     }
+//         for(int i =y-1;i>=0;i--){
+//             Square s = new Square(x,i);
+//             if(!checkIfMoveable(s, color)){
+//                 if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+//                     if(p==1){
+//                         break;
+//                     }
+//                     p++;
+//                     s.copy(possiblePin);
+//                     continue;
+//                    }
+//                 break;
+//             }else{
+//                 if(movement){
+//                 moveable.add(s);
+//                 }
+//                 if (board[x][i]!=null){
+//                     if(!movement){
+//                         if(p==0){
+//                             moveable.add(s);}
+//                             else{
+//                                 //if we are in "pin mode" and its a piece that can pin 
+//                                 if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+//                                     s.copy(possibleAttacker);
+//                                     if(pins !=null) pins.add(possiblePin);
+//                                     if(attackers !=null) attackers.add(possibleAttacker);
+//                                 }
+//                             }
+//                     }
+//                     break;
+//                 }
+//             }
+//         }
+// //x right
+//         if(!movement){
+//             p=0;
+//             possibleAttacker =new Square();
+//             possiblePin =new Square();
+//         }
+//         for(int i =x+1;i<8;i++){
+//             Square s = new Square(i,y);
+//             if(!checkIfMoveable(s, color)){
+//                 if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+//                     if(p==1){
+//                         break;
+//                     }
+//                     p++;
+//                     s.copy(possiblePin);
+//                     continue;
+//                    }
+//                 break;
+//             }else{
+//                 if(movement){
+//                     moveable.add(s);
+//                     }
+//                 if (board[i][y]!=null){
+//                     if(!movement){
+//                         if(p==0){
+//                             moveable.add(s);}
+//                             else{
+//                                 //if we are in "pin mode" and its a piece that can pin 
+//                                 if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+//                                     s.copy(possibleAttacker);
+//                                     if(pins !=null) pins.add(possiblePin);
+//                                     if(attackers !=null) attackers.add(possibleAttacker);
+//                                 }
+//                             }
+//                     }
+//                     break;
+//                 }
+//             }
+//         }
+//         //x left
+//         if(!movement){
+//             p=0;
+//             possibleAttacker =new Square();
+//              possiblePin =new Square();
+//         }
+//         for(int i =x-1;i>=0;i--){
+//             Square s = new Square(i,y);
+//             if(!checkIfMoveable(s, color)){
+//                 if(!movement&&checkIfMoveable(s, pcolorOther(color))){
+//                     if(p==1){
+//                         break;
+//                     }
+//                     p++;
+//                     s.copy(possiblePin);
+//                     continue;
+//                    }
+//                 break;
+//             }else{
+//                 if(movement){
+//                     moveable.add(s);
+//                     }
+//                 if (board[i][y]!=null){
+//                     if(!movement){
+//                         if(p==0){
+//                             moveable.add(s);}
+//                             else{
+//                                 //if we are in "pin mode" and its a piece that can pin 
+//                                 if(board[s.getX()][s.getY()].type == PType.ROOK||board[s.getX()][s.getY()].type == PType.QUEEN){
+//                                     s.copy(possibleAttacker);
+//                                     if(pins !=null) pins.add(possiblePin);
+//                                     if(attackers !=null) attackers.add(possibleAttacker);
+//                                 }
+//                             }
+//                     }
+//                     break;
+//                 }
+//             }
+//         }
+//         return moveable;
+//     }
     // private static ArrayList<Square> bishopMovment(Square square,PColor color,boolean movement){
     //     ArrayList<Square> moveable = new ArrayList<>();
     //     int x = square.getX();
@@ -562,153 +644,66 @@ public class Pieces {
         }
         return moveable;
     }
-    private static ArrayList<Square> diagonalThreatsAndPins(Square square,PColor color){
+    private static ArrayList<Square> diagonalThreatsAndPins(Square square, PColor color, ArrayList<Square> pinners, ArrayList<Square> pins){
         ArrayList<Square> possibleThreats = new ArrayList<>();
-        int x = square.getX();
-        int y = square.getY();
-        boolean couldBePinned = false;
-        Square possiblePin =new Square();
-        Square possibleAttacker =new Square();
-        //up right
-        for(int i = x+1;i<8;i++){
-            Square s = new Square(i,y-i+x);
-            if(checkIfMoveable(s, color)){
-                if (board[s.getX()][s.getY()] != null) {
-                    if (!couldBePinned){
-                    possibleThreats.add(s);
-                    break;
-                    }else{
-                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
-                            System.out.println("I'm pinned down diagonally!");
-                            s.copy(possibleAttacker);
-                            OnMouseClick.pinned.add(possiblePin);
-                            OnMouseClick.attackers.add(possibleAttacker);
-                        }
-                    }
-                }
-            } else {
-                if (couldBePinned){
-                    break;
-                } else {
-                    couldBePinned = true;
-                    possiblePin = s;
-                }
-                
-            }
-        }
-        couldBePinned = false;
-        // down right
-        for(int i = x+1;i<8;i++){
-            Square s = new Square(i,y+i-x);
-            if(checkIfMoveable(s, color)){
-                if (board[s.getX()][s.getY()] != null) {
-                    if (!couldBePinned){
-                    possibleThreats.add(s);
-                    break;
-                    }else{
-                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
-                            System.out.println("I'm pinned down diagonally!");
-                            s.copy(possibleAttacker);
-                            OnMouseClick.pinned.add(possiblePin);
-                            OnMouseClick.attackers.add(possibleAttacker);
-                        }
-                    }
-                }
-            } else {
-                if (couldBePinned){
-                    break;
-                } else {
-                    couldBePinned = true;
-                    possiblePin = s;
-                }
-                
-            }
-        }
-        couldBePinned = false;
-        // up left
-        for(int i = x-1;i>=0;i--){
-            Square s = new Square(i,y-x+i);
-            if(checkIfMoveable(s, color)){
-                if (board[s.getX()][s.getY()] != null) {
-                    if (!couldBePinned){
-                    possibleThreats.add(s);
-                    break;
-                    }else{
-                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
-                            System.out.println("I'm pinned down diagonally!");
-                            s.copy(possibleAttacker);
-                            OnMouseClick.pinned.add(possiblePin);
-                            OnMouseClick.attackers.add(possibleAttacker);
-                        }
-                    }
-                }
-            } else {
-                if (couldBePinned){
-                    break;
-                } else {
-                    couldBePinned = true;
-                    possiblePin = s;
-                }
-                
-            }
-        }
-        couldBePinned = false;
-        // down left
-        for(int i = x-1;i>=0;i--){
-            Square s = new Square(i,y+x-i);
-            if(checkIfMoveable(s, color)){
-                if (board[s.getX()][s.getY()] != null) {
-                    if (!couldBePinned){
-                    possibleThreats.add(s);
-                    break;
-                    }else{
-                        if(board[s.getX()][s.getY()].type == PType.BISHOP||board[s.getX()][s.getY()].type == PType.QUEEN){
-                            System.out.println("I'm pinned down diagonally!");
-                            s.copy(possibleAttacker);
-                            OnMouseClick.pinned.add(possiblePin);
-                            OnMouseClick.attackers.add(possibleAttacker);
-                        }
-                    }
-                }
-            } else {
-                if (couldBePinned){
-                    break;
-                } else {
-                    couldBePinned = true;
-                    possiblePin = s;
-                }
-                
-            }
-        }
+        //up right i = x+1;i<8;i++ new Square(i,y-i+x)
+        Square ur = diagThreatsHelper(square, color, pinners, pins, true, true);
+        if (ur != null) possibleThreats.add(ur);
+        // down right i = x+1;i<8;i++ new Square(i,y+i-x)
+        Square dr = diagThreatsHelper(square, color, pinners, pins, true, false);
+        if (dr != null) possibleThreats.add(dr);
+        // up left i = x-1 i>=0 i-- new Square(i,y-x+i)
+        Square ul = diagThreatsHelper(square, color, pinners, pins, false, true);
+        if (ul != null) possibleThreats.add(ul);
+        // down left i = x-1 i>=0 i-- new Square(i,y+x-i)
+        Square dl = diagThreatsHelper(square, color, pinners, pins, false, false);
+        if (dl != null) possibleThreats.add(dl);
         return possibleThreats;
     }
-    public static ArrayList<Square> threatsToPiece(PColor color,Square square){
-        OnMouseClick.pinned = new ArrayList<>();
-        OnMouseClick.attackers = new ArrayList<>();
-        ArrayList<Square> rookThreats = rookMovement(square, color, false);
-        ArrayList<Square> diagnalThreats = diagonalThreatsAndPins(square, color);
-        ArrayList<Square> attackers= knightMovement(square, color, false);
-        for(Square s: rookThreats){
-            if(board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.ROOK){
-                attackers.add(s);
+    private static Square diagThreatsHelper(Square square, PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned, boolean right, boolean up){
+        int x = square.getX();
+        int y = square.getY();
+        Square possiblePin = null;
+        int xDiff = -1;
+        int yDiff = -1;
+        if (right) xDiff = 1;
+        if (up) yDiff = 1;
+        for(int i = x+xDiff;i>=0 && i < 8;i+=xDiff) {
+            Square s = new Square(i,y+(x*yDiff)-(i*yDiff));
+            if(checkIfMoveable(s, color)){
+                if (board[s.getX()][s.getY()] != null && (board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.BISHOP||board[s.getX()][s.getY()].type==PType.PAWN)) {
+                    if (possiblePin != null && board[s.getX()][s.getY()].type!=PType.PAWN){
+                        pinned.add(possiblePin);
+                        if (pinners != null) pinners.add(s);
+                        return null;
+                    }
+                    // prevents pawns from pinning pieces diagonally
+                    return possiblePin == null ? s : null;
+                }
+            //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
+            }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
+                possiblePin = s;
+            //walked out of bounds
+            } else {
+                return null;
             }
-
+            
         }
-        for(Square s: diagnalThreats){
-            System.out.print("diag threat, "+s.getX()+", "+ s.getY());
-            if(board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.BISHOP||board[s.getX()][s.getY()].type==PType.PAWN){
-                System.out.println(" from a " +board[s.getX()][s.getY()].color +" "+ board[s.getX()][s.getY()].type);
-                attackers.add(s);
-            }
+        return null;
+    }
 
-        }
+    public static ArrayList<Square> threatsToPiece(PColor color,Square square, ArrayList<Square> pinners, ArrayList<Square> pinned){
+        ArrayList<Square> rookThreats = veticalNHorizontalThreats(square, color, pinners, pinned);
+        ArrayList<Square> diagnalThreats = diagonalThreatsAndPins(square, color, pinners, pinned);
+        ArrayList<Square> attackers = knightMovement(square, color, false);
+        attackers.addAll(rookThreats);
+        attackers.addAll(diagnalThreats);
         return attackers;
 
     }
     public static boolean pieceBlocks(Square toBlock,Square attacker,Square blocker){
         //if they are being attacked in a line eg rook
         if(toBlock.getX()==attacker.getX()){
-           
             return (blocker.getX() ==toBlock.getX()&&((blocker.getY()<toBlock.getY()&&blocker.getY()>attacker.getY())||(blocker.getY()>toBlock.getY()&&blocker.getY()<attacker.getY())));
         }
         if(toBlock.getY()==attacker.getY()){

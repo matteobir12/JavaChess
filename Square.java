@@ -26,12 +26,14 @@ public class Square {
 
     @Override
     public String toString(){
-        return "" + x + ", " + y;
+        char charX = (char)(x+97);
+        char charY = (char)((8-y)+48);
+        return charX + "" + charY;
     }
     @Override
     public boolean equals(Object o){
         Square s = (Square) o;
-        return (this.x == s.getX() && this.y == s.getY());
+        return (s != null && this.x == s.getX() && this.y == s.getY());
     }
     public void copy(Square s){
         s.setX(x);

@@ -3,9 +3,11 @@ import javax.swing.*;
 import java.util.Iterator;
 
 public class OnMouseClick {
-     static Square clickedSquare;
+    static Square clickedSquare;
     static ArrayList<Square> squares;
-    static ArrayList<Square> threats,pinned,attackers;
+    static ArrayList<Square> threats;
+    static ArrayList<Square> pinned = new ArrayList<>();
+    static ArrayList<Square> pinners = new ArrayList<>();
     public static void click(Square square){
         
         Board.removeCircles(); //deletes everything in circBoxes
@@ -45,11 +47,9 @@ public class OnMouseClick {
             }
             //is a piece pinned?
             if(pinned != null && !pinned.isEmpty()){
-                System.out.println("there is a pinned piece");
                 for(int i=0; i<pinned.size();i++){
                     //is it the piece they clicked
                     if(square.equals(pinned.get(i))){
-                        System.out.println("I am the pinned piece");
                         Square curking;
                          if(Main.curTurn == PColor.BLACK){
                             curking = Board.bkinSquare;
@@ -58,10 +58,9 @@ public class OnMouseClick {
                              }       
                         Iterator<Square> iter = squares.iterator(); 
                         while(iter.hasNext()){
-                        System.out.println("what can I do");
                         Square tmpS = iter.next();
                         //if the move doesnt break the pin
-                        if(Pieces.pieceBlocks(curking, attackers.get(i), tmpS) || tmpS.equals(attackers.get(i))){
+                        if(Pieces.pieceBlocks(curking, pinners.get(i), tmpS) || tmpS.equals(pinners.get(i))){
                             continue;
                         }
                         iter.remove();
@@ -120,33 +119,48 @@ public class OnMouseClick {
                         }
                     }
                     //switch turns and update move order
-                    pinned = null;
-                    attackers = null;
+                    pinned = new ArrayList<>();
+                    pinners = new ArrayList<>();
                     if(Main.curTurn == PColor.WHITE){
                         Main.curTurn = PColor.BLACK;
                         Board.addToMoveOrder(PColor.WHITE, type, s,clickedSquare);
-                        //king in check?
-                         threats = Pieces.threatsToPiece(PColor.BLACK, Board.bkinSquare);
+                        // assessing threats to black king
+                        System.out.println("assessing threats to black king");
+                         threats = Pieces.threatsToPiece(PColor.BLACK, Board.bkinSquare,pinners,pinned);
                         for(Square t:threats) {
-                            System.out.println(t.toString());
+                            System.out.println("Black is in check from " + t.toString());
+                        }
+                        for(Square p:pinners) {
+                            System.out.println("Black is pinned check from " + p.toString());
+                        }
+                        for(Square p:pinned) {
+                            System.out.println("White is pinned on " + p.toString());
                         }
                     }else{
                         Main.curTurn = PColor.WHITE;
                         Board.addToMoveOrder(PColor.BLACK, type, s,clickedSquare);
-                        //king in check?
-                        threats = Pieces.threatsToPiece(PColor.WHITE, Board.wKingSquare);
+                        //assessing threats to white king
+                        System.out.println("assessing threats to black king");
+                        threats = Pieces.threatsToPiece(PColor.WHITE, Board.wKingSquare,pinners,pinned);
                         for(Square t:threats){
-                            System.out.println(t.toString());
+                            System.out.println("White is in check from " + t.toString());
+                        }
+                        for(Square p:pinners) {
+                            System.out.println("White is pinned from " + p.toString());
+                        }
+                        for(Square p:pinned) {
+                            System.out.println("White is pinned on " + p.toString());
                         }
                     }
+
                    //reset things
                     Pieces.board[clickedSquare.getX()][clickedSquare.getY()] = null;
                     squares = new ArrayList<>();
                     
-                    System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
-                    System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
-                    System.out.println("black can castle long " + Pieces.blackCanCastleLong);
-                    System.out.println("black can castle short " + Pieces.blackCanCastleShort);
+                    // System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
+                    // System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
+                    // System.out.println("black can castle long " + Pieces.blackCanCastleLong);
+                    // System.out.println("black can castle short " + Pieces.blackCanCastleShort);
 
                     break;  
 
