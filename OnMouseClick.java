@@ -13,19 +13,19 @@ public class OnMouseClick {
         Board.removeCircles(); //deletes everything in circBoxes
 
         // if they clicked on their own piece
-        if (Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].color == Main.curTurn) {
-            squares = Pieces.movement(square);
+        if (Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].getColor() == Main.curTurn) {
+            squares = Pieces.board[square.getX()][square.getY()].getPossibleMoves();
             //if the king is under attack
-            if (threats!=null && !threats.isEmpty() && Pieces.board[square.getX()][square.getY()].type != PType.KING) {
+            if (threats!=null && !threats.isEmpty() && Pieces.board[square.getX()][square.getY()].getType() != PType.KING) {
                 //by one attacker
                 if (threats.size()==1){
                     Square curking;
                     if(Main.curTurn == PColor.BLACK) {
-                        curking = Board.bkinSquare;
+                        curking = Board.bKingSquare;
                     } else {
                     curking = Board.wKingSquare;
                 }
-                boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].type==PType.KNIGHT);
+                boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].getType()==PType.KNIGHT);
                 Iterator<Square> iter = squares.iterator(); 
                 while(iter.hasNext()){
                     Square tmpS = iter.next();
@@ -36,7 +36,7 @@ public class OnMouseClick {
                     iter.remove();
                 }
                 }else{
-                    if(!square.equals(Board.bkinSquare) && !square.equals(Board.wKingSquare)){
+                    if(!square.equals(Board.bKingSquare) && !square.equals(Board.wKingSquare)){
                         for(int i = 0; i<squares.size(); i++){
                             squares.remove(i);
                         }
@@ -51,7 +51,7 @@ public class OnMouseClick {
                     if(square.equals(pinned.get(i))){
                         Square curking;
                         if(Main.curTurn == PColor.BLACK){
-                            curking = Board.bkinSquare;
+                            curking = Board.bKingSquare;
                         }else{
                             curking = Board.wKingSquare;
                         }       
@@ -78,24 +78,25 @@ public class OnMouseClick {
             }
         }else{ //if they didnt click on their piece they must have clicked an enemy piece or a free square
             
-            for(Square s: squares){
+             if(squares != null) for(Square s: squares){
                 
                 if (square.equals(s)){
-                    Board.circBoxes.add(Pieces.board[clickedSquare.getX()][clickedSquare.getY()].label);
+                    // delete old piece(s) location
+                    Board.circBoxes.add(Pieces.board[clickedSquare.getX()][clickedSquare.getY()].getLabel());
                     if(Pieces.board[square.getX()][square.getY()]!=null){
-                        Board.circBoxes.add(Pieces.board[square.getX()][square.getY()].label); 
+                        Board.circBoxes.add(Pieces.board[square.getX()][square.getY()].getLabel()); 
                         Board.ex = true;
                     }
                     Board.removeCircles();
                     
                     // change board in pieces clickedSquare is old square s is new square
                     String string = "./assets/";
-                    String color = Pieces.board[clickedSquare.getX()][clickedSquare.getY()].color.toString().toLowerCase();////
+                    String color = Pieces.board[clickedSquare.getX()][clickedSquare.getY()].getColor().toString().toLowerCase();////
                     Board.afterMove(clickedSquare, s, color);
-                    String type = Pieces.board[clickedSquare.getX()][clickedSquare.getY()].type.toString().toLowerCase();
+                    String type = Pieces.board[clickedSquare.getX()][clickedSquare.getY()].getType().toString().toLowerCase();
                     JLabel l = new JLabel(new ImageIcon(string+color+"_"+type+".png"));
                     Pieces.board[s.getX()][s.getY()] = Pieces.board[clickedSquare.getX()][clickedSquare.getY()];
-                    Pieces.board[s.getX()][s.getY()].label = l;
+                    Pieces.board[s.getX()][s.getY()].setLabel(l);
                     Board.boardPanel[s.getX()][s.getY()].add(l);
 
                     //reset things
@@ -105,37 +106,7 @@ public class OnMouseClick {
                     //switch turns and update move order
                     pinned = new ArrayList<>();
                     pinners = new ArrayList<>();
-                    if(Main.curTurn == PColor.WHITE){
-                        Main.curTurn = PColor.BLACK;
-                        Board.addToMoveOrder(PColor.WHITE, type, s,clickedSquare);
-                        // assessing threats to black king
-                        System.out.println("assessing threats to black king");
-                         threats = Pieces.threatsToPiece(PColor.BLACK, Board.bkinSquare,pinners,pinned);
-                        for(Square t:threats) {
-                            System.out.println("Black is in check from " + t.toString());
-                        }
-                        for(Square p:pinners) {
-                            System.out.println("Black is pinned from " + p.toString());
-                        }
-                        for(Square p:pinned) {
-                            System.out.println("Black is pinned on " + p.toString());
-                        }
-                    }else{
-                        Main.curTurn = PColor.WHITE;
-                        Board.addToMoveOrder(PColor.BLACK, type, s,clickedSquare);
-                        //assessing threats to white king
-                        System.out.println("assessing threats to whites king");
-                        threats = Pieces.threatsToPiece(PColor.WHITE, Board.wKingSquare,pinners,pinned);
-                        for(Square t:threats){
-                            System.out.println("White is in check from " + t.toString());
-                        }
-                        for(Square p:pinners) {
-                            System.out.println("White is pinned from " + p.toString());
-                        }
-                        for(Square p:pinned) {
-                            System.out.println("White is pinned on " + p.toString());
-                        }
-                    }
+                    Pieces.switchAndPrepareForNextTurn(Main.curTurn, type, s, clickedSquare);
                     
                     // System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
                     // System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
