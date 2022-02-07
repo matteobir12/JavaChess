@@ -21,7 +21,8 @@ public class Board {
     static String moveOrder="";
     static Piece enpassant;
     static ArrayList<Square> kingThreats;
-    static Square wKingSquare,bkinSquare;
+    static Square wKingSquare;
+    static Square bKingSquare;
 
     public static void makeNewBoard(){
         frame = new JFrame();
@@ -83,11 +84,11 @@ public class Board {
             for(int j=0; j<8; j++){
                 if(Pieces.board[j][i] == null){continue;}
                 String s = "./assets/";
-                String color = Pieces.board[j][i].color.toString().toLowerCase();
-                String type = Pieces.board[j][i].type.toString().toLowerCase();
+                String color = Pieces.board[j][i].getColor().toString().toLowerCase();
+                String type = Pieces.board[j][i].getType().toString().toLowerCase();
                 JLabel l = new JLabel(new ImageIcon(s + color + "_" + type + ".png"));
                 boardPanel[j][i].add(l);
-                Pieces.board[j][i].label = l;
+                Pieces.board[j][i].setLabel(l);
                 
             }
         }
@@ -176,7 +177,7 @@ public class Board {
             if(s == null || Pieces.board[s.getX()][s.getY()] == null || s.equals(originalSquare)){
                 continue;
             }
-            if(Pieces.board[s.getX()][s.getY()].type == Pieces.board[destinationSquare.getX()][destinationSquare.getY()].type && Pieces.board[s.getX()][s.getY()].color == Pieces.board[destinationSquare.getX()][destinationSquare.getY()].color){
+            if(Pieces.board[s.getX()][s.getY()].getType() == Pieces.board[destinationSquare.getX()][destinationSquare.getY()].getType() && Pieces.board[s.getX()][s.getY()].getColor() == Pieces.board[destinationSquare.getX()][destinationSquare.getY()].getColor()){
                 if(s.getX()==destinationSquare.getX()) {
                     char y = (char)((8-originalSquare.getY())+48);
                     moveOrder+= y;
@@ -192,35 +193,35 @@ public class Board {
     }
     public static void afterMove(Square pieceOldSquare, Square pieceNewSquare, String color){
         //if king moved test if it was a castle and move the rook too. also update the king square.
-        if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type==PType.KING){
-            if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].color == PColor.BLACK){
-                bkinSquare = new Square(pieceOldSquare.getX(), pieceOldSquare.getY());
+        if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getType()==PType.KING){
+            if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getColor() == PColor.BLACK){
+                bKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
                 if (Pieces.blackCanCastleLong||Pieces.blackCanCastleShort){
                     castle(color, pieceOldSquare, pieceNewSquare);
                 }
             }
-            if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].color == PColor.WHITE ){
-                bkinSquare = new Square(pieceOldSquare.getX(), pieceOldSquare.getY());
+            if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getColor() == PColor.WHITE ){
+                wKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
                 if(Pieces.whiteCanCastleLong||Pieces.whiteCanCastleShort){
                     castle(color, pieceOldSquare, pieceNewSquare);
                 }
             }
         } 
         //if a rook was moved check if we want to stop castling
-        if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type == PType.ROOK){
+        if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getType() == PType.ROOK){
             noCastle(pieceOldSquare);
         }
         // if we just enpassented
-        if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type == PType.PAWN && pieceOldSquare.getX()!=pieceNewSquare.getX() && Pieces.board[pieceNewSquare.getX()][pieceNewSquare.getY()] == null){
-            Container parent = Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()].label.getParent();
+        if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getType() == PType.PAWN && pieceOldSquare.getX()!=pieceNewSquare.getX() && Pieces.board[pieceNewSquare.getX()][pieceNewSquare.getY()] == null){
+            Container parent = Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()].getLabel().getParent();
             if(parent!=null){
-                parent.remove(Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()].label);
+                parent.remove(Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()].getLabel());
             }
             //remove pawn
             Pieces.board[pieceNewSquare.getX()][pieceOldSquare.getY()] = null;
         }
         Pieces.setEnPassentable(null);
-        if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].type == PType.PAWN && (pieceNewSquare.getY()==pieceOldSquare.getY() + 2 || pieceNewSquare.getY()==pieceOldSquare.getY() - 2)){
+        if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getType() == PType.PAWN && (pieceNewSquare.getY()==pieceOldSquare.getY() + 2 || pieceNewSquare.getY()==pieceOldSquare.getY() - 2)){
             System.out.println(pieceNewSquare.toString() + " pessanable");
             Pieces.setEnPassentable(pieceNewSquare);
         }
@@ -233,12 +234,12 @@ public class Board {
             //queenside
             didCastleLong = true;
             Pieces.board[3][square.getY()] = Pieces.board[0][square.getY()];
-            Container parent = Pieces.board[0][square.getY()].label.getParent();
+            Container parent = Pieces.board[0][square.getY()].getLabel().getParent();
             
             if(parent!=null){
-                parent.remove(Pieces.board[0][square.getY()].label);
+                parent.remove(Pieces.board[0][square.getY()].getLabel());
             }
-            Pieces.board[3][square.getY()].label = lab;
+            Pieces.board[3][square.getY()].setLabel(lab);
             Board.boardPanel[3][square.getY()].add(lab);
 
             //remove rook
@@ -249,25 +250,25 @@ public class Board {
             //kingside
             didCastleShort = true;
             Pieces.board[5][square.getY()] = Pieces.board[7][square.getY()];
-            Container parent = Pieces.board[7][square.getY()].label.getParent();
+            Container parent = Pieces.board[7][square.getY()].getLabel().getParent();
             if(parent!=null) {
-                parent.remove(Pieces.board[7][square.getY()].label);
+                parent.remove(Pieces.board[7][square.getY()].getLabel());
             }
-            Pieces.board[5][square.getY()].label = lab;
+            Pieces.board[5][square.getY()].setLabel(lab);
             Board.boardPanel[5][square.getY()].add(lab);
             Pieces.board[7][square.getY()] = null;
         }
     }
     private static void noCastle(Square square){
         if(square.getX() == 0){
-            if(Pieces.board[square.getX()][square.getY()].color == PColor.WHITE){
+            if(Pieces.board[square.getX()][square.getY()].getColor() == PColor.WHITE){
                 Pieces.whiteCanCastleLong = false;
             }else{
                 Pieces.blackCanCastleLong = false;
             }
         }
         if(square.getX()==7){
-            if(Pieces.board[square.getX()][square.getY()].color == PColor.WHITE){
+            if(Pieces.board[square.getX()][square.getY()].getColor() == PColor.WHITE){
                 Pieces.whiteCanCastleShort = false;
             }else{
                 Pieces.blackCanCastleShort = false;

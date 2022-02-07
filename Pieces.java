@@ -1,10 +1,16 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Pieces {
 
     public static Piece[][] board = new Piece[8][8];
-    static boolean whiteCanCastleShort, whiteCanCastleLong;
-    static boolean blackCanCastleShort, blackCanCastleLong;
+    static boolean whiteCanCastleLong;
+    static boolean whiteCanCastleShort;
+    static boolean blackCanCastleLong;
+    static boolean blackCanCastleShort;
+    static ArrayList<Square> threats;
+    static ArrayList<Square> pinned = new ArrayList<>();
+    static ArrayList<Square> pinners = new ArrayList<>();
     private static Square enPassentable;
     
     /*{{Piece.BLACK_ROOK, Piece.BLACK_KNIGHT, Piece.BLACK_BISHOP, Piece.BLACK_QUEEN, Piece.BLACK_KING, Piece.BLACK_BISHOP, Piece.BLACK_KNIGHT, Piece.BLACK_ROOK},
@@ -26,7 +32,7 @@ public class Pieces {
         blackCanCastleShort=true;
          blackCanCastleLong = true;
         PColor curColor = null;
-        Board.bkinSquare = new Square(4, 0);
+        Board.bKingSquare = new Square(4, 0);
         Board.wKingSquare = new Square(4, 7);
 
         for(int i = 0; i < 8; i+=7){
@@ -51,143 +57,103 @@ public class Pieces {
             board[i][1] = new Piece(PColor.BLACK, PType.PAWN);
             board[i][6] = new Piece(PColor.WHITE, PType.PAWN);
         }
+        updatePiecesPossibleMoves(PColor.WHITE);
     }
 
 
     public static ArrayList<Square> movement(Square square){
-
         ArrayList<Square> moveable = new ArrayList<>();
-        if(board[square.getX()][square.getY()] == null){return moveable;}
+        if(board[square.getX()][square.getY()] == null)return moveable;
         Piece p = board[square.getX()][square.getY()];
-        switch(p.type){
+        switch(p.getType()){
             case PAWN:
-                if(p.color == PColor.WHITE){
-                    Square s = new Square(square.getX(), square.getY() - 1);
-                    if(pawnCheckVertical(s)){
-                        moveable.add(s);
-                        if(square.getY() == 6){
-                            s = new Square(square.getX(), square.getY() - 2);
-                            if(pawnCheckVertical(s)){
-                                moveable.add(s);
-                            }
-                        }
-                    }
-                    s = new Square(square.getX() - 1, square.getY() - 1);
-                    if(pawnTakes(s, PColor.WHITE)){
-                        moveable.add(s);
-                    }
-                    s = new Square(square.getX() + 1, square.getY() - 1);
-                    if(pawnTakes(s, PColor.WHITE)){
-                        moveable.add(s);
-                    }
-                    if(enPassentable != null && enPassentable.getY()==square.getY()){
-                        if(enPassentable.getX() == square.getX() - 1){
-                            s = new Square(square.getX() - 1,square.getY() - 1);
-                            moveable.add(s);
-                        }else if(enPassentable.getX() == square.getX() + 1) {
-                            s = new Square(square.getX() + 1,square.getY() - 1);
+                int diff = (p.getColor() == PColor.WHITE) ? -1: 1;
+                Square s = new Square(square.getX(), square.getY() + diff);
+                if(pawnCheckVertical(s)){
+                    moveable.add(s);
+                    if((square.getY() == 6 && diff == -1) || (square.getY() == 1 && diff == 1)){
+                        s = new Square(square.getX(), square.getY() + (2*diff));
+                        if(pawnCheckVertical(s)){
                             moveable.add(s);
                         }
                     }
                 }
-                else if(p.color == PColor.BLACK){
-                    Square s = new Square(square.getX(), square.getY() + 1);
-                    if(pawnCheckVertical(s)){
-                        moveable.add(s);
-                        if(square.getY() == 1){
-                            s = new Square(square.getX(), square.getY() + 2);
-                            if(pawnCheckVertical(s)){
-                                moveable.add(s);
-                            }
-                        }
-                    }
-                     s = new Square(square.getX() - 1, square.getY() + 1);
-                    if(pawnTakes(s, PColor.BLACK)){
-                        moveable.add(s);
-                    }
-                     s = new Square(square.getX() + 1, square.getY() + 1);
-                    if(pawnTakes(s, PColor.BLACK)){
-                        moveable.add(s);
-                    }
-                    if(enPassentable != null && enPassentable.getY()==square.getY()){
-                        if(enPassentable.getX() == square.getX() - 1){
-                            s = new Square(square.getX() - 1,square.getY() + 1);
-                            moveable.add(s);
-                        }else if(enPassentable.getX() == square.getX() + 1) {
-                            s = new Square(square.getX() + 1,square.getY() + 1);
-                            moveable.add(s);
-                        }
-                        
-                        
-                        
-                    }
+                boolean enAndYequals = (enPassentable != null && enPassentable.getY() == square.getY());
+                s = new Square(square.getX() - 1, square.getY() + diff);
+                if((pawnTakes(s, p.getColor()) || (enAndYequals && enPassentable.getX() == square.getX() - 1))){
+                    moveable.add(s);
+                }
+                s = new Square(square.getX() + 1, square.getY() + diff);
+                if(pawnTakes(s, p.getColor()) || enAndYequals && enPassentable.getX() == square.getX() + 1){
+                    moveable.add(s);
                 }
                 break;
             case ROOK:
-                moveable = rookMovement(square, p.color);
+                moveable = rookMovement(square, p.getColor());
                 break;
             case KNIGHT:
-                moveable = knightMovement(square,p.color,true);
+                moveable = knightMovement(square,p.getColor(),true);
                 break;
                 
             case BISHOP:
-                moveable = bishopMovement(square, p.color);
+                moveable = bishopMovement(square, p.getColor());
                 break;
             case QUEEN:
-            moveable = rookMovement(square, p.color);
-            moveable.addAll(bishopMovement(square, p.color));
+            moveable = rookMovement(square, p.getColor());
+            moveable.addAll(bishopMovement(square, p.getColor()));
                 break;
             case KING:
             Square sq = new Square(square.getX(), square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY());
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() + 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX(), square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() - 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() - 1, square.getY());
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
                 sq = new Square(square.getX() -1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.color)&&threatsToPiece(p.color, sq,null,null).isEmpty()){
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
-                if(board[square.getX()][square.getY()].color == PColor.WHITE){
-                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null&&threatsToPiece(p.color, new Square(2, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(1, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(3, 7),null,null).isEmpty()&&OnMouseClick.threats.isEmpty()){
+                if(board[square.getX()][square.getY()].getColor() == PColor.WHITE){
+                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null&&threatsToPiece(p.getColor(), new Square(2, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(1, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(3, 7),null,null).isEmpty()&&threats.isEmpty()){
                       moveable.add(new Square(2, 7));
                     }
-                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null&&threatsToPiece(p.color, new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(6, 7),null,null).isEmpty()&&OnMouseClick.threats.isEmpty()){
+                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null&&threatsToPiece(p.getColor(), new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(6, 7),null,null).isEmpty()&&threats.isEmpty()){
                       moveable.add(new Square(6, 7));
                     }
                   }else{
-                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(3, 0),null,null).isEmpty()&&threatsToPiece(p.color, new Square(2, 0),null,null).isEmpty()&&threatsToPiece(p.color, new Square(1, 0),null,null).isEmpty()){
+                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(3, 0),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(2, 0),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(1, 0),null,null).isEmpty()){
                           moveable.add(new Square(2, 0));
                         }
-                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null&&OnMouseClick.threats.isEmpty()&&threatsToPiece(p.color, new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.color, new Square(6, 7),null,null).isEmpty()) {
+                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(6, 7),null,null).isEmpty()) {
                           moveable.add(new Square(6, 0));
                         }
               }
                 break;
         }
-        
+        restrictMovementIfInCheck(square, moveable);
+        restrictMovementIfPinned(square, moveable);
         return moveable;
     }
 
@@ -195,7 +161,7 @@ public class Pieces {
         if(square.getX() > 7 || square.getY() > 7 || square.getX() < 0 || square.getY() < 0){
             return false;
         }
-        return ((board[square.getX()][square.getY()] == null) || (board[square.getX()][square.getY()].color != taker));
+        return ((board[square.getX()][square.getY()] == null) || (board[square.getX()][square.getY()].getColor() != taker));
         
     }
 
@@ -210,7 +176,7 @@ public class Pieces {
         if(square.getX() > 7 || square.getY() > 7 || square.getX() < 0 || square.getY() < 0){
             return false;
         }
-        if(board[square.getX()][square.getY()] != null && board[square.getX()][square.getY()].color != taker){
+        if(board[square.getX()][square.getY()] != null && board[square.getX()][square.getY()].getColor() != taker){
             return true;
         }
         return false;
@@ -219,35 +185,35 @@ public class Pieces {
     private static ArrayList<Square> knightMovement(Square square,PColor color,boolean movement){
         ArrayList<Square> moveable = new ArrayList<>();
         Square s = new Square(square.getX() - 2, square.getY() - 1);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() - 1, square.getY() - 2);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() + 2, square.getY() + 1);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() + 1, square.getY() + 2);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() - 1, square.getY() + 2);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() - 2, square.getY() + 1);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() + 1, square.getY() - 2);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 s = new Square(square.getX() + 2, square.getY() - 1);
-                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].type == PType.KNIGHT))){
+                if(checkIfMoveable(s, color)&&(movement||(board[s.getX()][s.getY()]!=null&&board[s.getX()][s.getY()].getType() == PType.KNIGHT))){
                     moveable.add(s);
                 }
                 return moveable;
@@ -323,13 +289,16 @@ public class Pieces {
             //is empty or of opposite color
             if(checkIfMoveable(s, color)) {
                 // check if its not empty and if the piece is a queen or rook
-                if (board[s.getX()][s.getY()]!=null && (board[s.getX()][s.getY()].type == PType.QUEEN||board[s.getX()][s.getY()].type == PType.ROOK)) {
+                if (board[s.getX()][s.getY()] != null){ 
+                    if (board[s.getX()][s.getY()].getType() == PType.QUEEN||board[s.getX()][s.getY()].getType() == PType.ROOK) {
                         if (possiblePin != null) { 
                             pinned.add(possiblePin);
                             if (pinners != null) pinners.add(s);
                             return null;
                         }
                         return s;
+                    }
+                    return null;
                 }
             //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
             }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
@@ -403,14 +372,16 @@ public class Pieces {
         for(int i = x+xDiff;i>=0 && i < 8;i+=xDiff) {
             Square s = new Square(i,y+(x*yDiff)-(i*yDiff));
             if(checkIfMoveable(s, color)){
-                if (board[s.getX()][s.getY()] != null && (board[s.getX()][s.getY()].type==PType.QUEEN||board[s.getX()][s.getY()].type==PType.BISHOP||board[s.getX()][s.getY()].type==PType.PAWN)) {
-                    if (possiblePin != null && board[s.getX()][s.getY()].type!=PType.PAWN){
-                        pinned.add(possiblePin);
-                        if (pinners != null) pinners.add(s);
-                        return null;
+                if (board[s.getX()][s.getY()] != null){
+                    if (board[s.getX()][s.getY()].getType()==PType.QUEEN||board[s.getX()][s.getY()].getType()==PType.BISHOP) {
+                        if (possiblePin != null){
+                            pinned.add(possiblePin);
+                            if (pinners != null) pinners.add(s);
+                            return null;
+                        }
+                        return s;
                     }
-                    // prevents pawns from pinning pieces diagonally
-                    return possiblePin == null ? s : null;
+                    return null;
                 }
             //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
             }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
@@ -424,12 +395,31 @@ public class Pieces {
         return null;
     }
 
+    private static ArrayList<Square> pawnThreats(Square square, PColor color){
+        ArrayList<Square> threats = new ArrayList<>();
+        int yDiff = (color == PColor.WHITE) ? -1: 1;
+        if(square.getY()+yDiff >=0 && square.getY()+yDiff < 8){
+            if(square.getX()-1 >=0 && square.getX()-1 < 8){
+                Square s = new Square(square.getX()-1,square.getY()+yDiff);
+                if (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.PAWN && board[s.getX()][s.getY()].getColor() == pcolorOther(color)) {
+                    threats.add(s);
+                }
+            }
+            if(square.getX()+1 >=0 && square.getX()+1 < 8){
+                Square s = new Square(square.getX()+1,square.getY()+yDiff);
+                if (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.PAWN && board[s.getX()][s.getY()].getColor() == pcolorOther(color)){
+                    threats.add(s);
+                }
+            }
+        }
+        return threats;
+    }
+
     public static ArrayList<Square> threatsToPiece(PColor color,Square square, ArrayList<Square> pinners, ArrayList<Square> pinned){
-        ArrayList<Square> rookThreats = veticalNHorizontalThreats(square, color, pinners, pinned);
-        ArrayList<Square> diagnalThreats = diagonalThreatsAndPins(square, color, pinners, pinned);
         ArrayList<Square> attackers = knightMovement(square, color, false);
-        attackers.addAll(rookThreats);
-        attackers.addAll(diagnalThreats);
+        attackers.addAll(veticalNHorizontalThreats(square, color, pinners, pinned));
+        attackers.addAll(diagonalThreatsAndPins(square, color, pinners, pinned));
+        attackers.addAll(pawnThreats(square, color));
         return attackers;
 
     }
@@ -464,7 +454,7 @@ public class Pieces {
             }
         }
 
-return false;
+    return false;
     }
     private static PColor pcolorOther(PColor color){
         if (color == PColor.BLACK){
@@ -472,10 +462,78 @@ return false;
         }
         return PColor.BLACK;
     }
-  public static void setEnPassentable(Square enPassentable) {
-      Pieces.enPassentable = enPassentable;
+    public static void setEnPassentable(Square enPassentable) {
+        Pieces.enPassentable = enPassentable;
   }
-  public static Square getEnPassentable() {
-      return enPassentable;
+    public static Square getEnPassentable() {
+        return enPassentable;
   }
+    public static void switchAndPrepareForNextTurn(PColor oldTurnColor, String type, Square newSquare, Square oldSquare){
+        PColor otherColor = pcolorOther(oldTurnColor);
+        Square newTurnKingSquare = (oldTurnColor == PColor.WHITE) ? Board.bKingSquare : Board.wKingSquare;
+        Main.curTurn = otherColor;
+        Board.addToMoveOrder(oldTurnColor, type, newSquare,oldSquare);
+        System.out.println("assessing threats to king on " + newTurnKingSquare.toString());
+        threats = threatsToPiece(otherColor, newTurnKingSquare,pinners,pinned);
+        if (updatePiecesPossibleMoves(otherColor)) System.out.println("no Moves");
+    }
+    private static boolean updatePiecesPossibleMoves(PColor color){
+        boolean noPossibleMoves = true;
+        for (int i = 0; i < 8; i++) for(int j = 0; j < 8; j++) {
+            if (board[i][j] != null && board[i][j].getColor() == color){
+                ArrayList<Square> possibleMoves = movement(new Square(i,j));
+                board[i][j].setPossibleMoves(possibleMoves);
+                if(!possibleMoves.isEmpty()){
+                    noPossibleMoves = false;
+                }
+            }
+        }
+        return noPossibleMoves;
+    }
+    private static ArrayList<Square> restrictMovementIfInCheck(Square square, ArrayList<Square> movement){
+        if (threats!=null && !threats.isEmpty() && Pieces.board[square.getX()][square.getY()].getType() != PType.KING) {
+            //by one attacker
+            if (threats.size()==1){
+                Square curking = (Main.curTurn == PColor.BLACK) ? Board.bKingSquare : Board.wKingSquare;
+            boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].getType()==PType.KNIGHT);
+            Iterator<Square> iter = movement.iterator(); 
+            while(iter.hasNext()){
+                Square tmpS = iter.next();
+                // if it can take the piece that put it in check or that piece blocks the check
+                if(tmpS.equals(threats.get(0)) || (!isKnight && Pieces.pieceBlocks(curking,threats.get(0),tmpS))){
+                    continue;
+                }
+                iter.remove();
+            }
+            }else{
+                if(!square.equals(Board.bKingSquare) && !square.equals(Board.wKingSquare)){
+                    for(int i = 0; i<movement.size(); i++){
+                        movement.remove(i);
+                    }
+                }
+            }
+            
+        }
+        return movement;
+    }
+    private static ArrayList<Square> restrictMovementIfPinned(Square square, ArrayList<Square> movement){
+        if(pinned != null && !pinned.isEmpty()){
+            for(int i=0; i<pinned.size();i++){
+                //is it the piece they clicked
+                if(square.equals(pinned.get(i))){
+                    Square curking = (Main.curTurn == PColor.BLACK) ? Board.bKingSquare : Board.wKingSquare ; 
+                    Iterator<Square> iter = movement.iterator(); 
+                    while(iter.hasNext()){
+                        Square tmpS = iter.next();
+                        //if the move doesnt break the pin
+                        if(pieceBlocks(curking, pinners.get(i), tmpS) || tmpS.equals(pinners.get(i))){
+                            continue;
+                    }
+                    iter.remove();
+                    }   
+                }
+            }
+        }
+        return movement;
+    }
 }
