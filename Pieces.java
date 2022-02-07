@@ -281,10 +281,11 @@ public class Pieces {
         if (xDirection) direction = x;
         for(int i = direction+diff;0<=i && i<8; i+=diff){
             Square s = new Square(!xDirection ? x :i, xDirection ? y :i);
-            //is empty or of opposite color
-            if(checkIfMoveable(s, color)) {
+            boolean squareHasTheKing = checkIfMoveable(s, pcolorOther(color)) && (board[s.getX()][s.getY()] != null &&board[s.getX()][s.getY()].getType() == PType.KING && board[s.getX()][s.getY()].getColor() == color);
+            //is empty or of opposite color and is not the current color king
+            if(checkIfMoveable(s, color) || squareHasTheKing) {
                 // check if its not empty and if the piece is a queen or rook
-                if (board[s.getX()][s.getY()] != null){ 
+                if (board[s.getX()][s.getY()] != null && !squareHasTheKing){ 
                     if (board[s.getX()][s.getY()].getType() == PType.QUEEN||board[s.getX()][s.getY()].getType() == PType.ROOK) {
                         if (possiblePin != null) { 
                             pinned.add(possiblePin);
@@ -366,17 +367,18 @@ public class Pieces {
         if (up) yDiff = 1;
         for(int i = x+xDiff;i>=0 && i < 8;i+=xDiff) {
             Square s = new Square(i,y+(x*yDiff)-(i*yDiff));
-            if(checkIfMoveable(s, color)){
-                if (board[s.getX()][s.getY()] != null){
-                    if (board[s.getX()][s.getY()].getType()==PType.QUEEN||board[s.getX()][s.getY()].getType()==PType.BISHOP) {
-                        if (possiblePin != null){
-                            pinned.add(possiblePin);
-                            if (pinners != null) pinners.add(s);
-                            return null;
+            boolean squareHasTheKing = checkIfMoveable(s, pcolorOther(color)) && (board[s.getX()][s.getY()] != null &&board[s.getX()][s.getY()].getType() == PType.KING && board[s.getX()][s.getY()].getColor() == color);
+            if(checkIfMoveable(s, color) || squareHasTheKing){
+                if (board[s.getX()][s.getY()] != null && !squareHasTheKing){
+                        if (board[s.getX()][s.getY()].getType()==PType.QUEEN||board[s.getX()][s.getY()].getType()==PType.BISHOP) {
+                            if (possiblePin != null){
+                                pinned.add(possiblePin);
+                                if (pinners != null) pinners.add(s);
+                                return null;
+                            }
+                            return s;
                         }
-                        return s;
-                    }
-                    return null;
+                        return null;
                 }
             //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
             }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
