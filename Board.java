@@ -12,7 +12,8 @@ public class Board {
     static int l = 1000;
     static int moveNumb = 1;
     static boolean ex = false;
-    static boolean didCastleShort, didCastleLong = false;
+    static boolean didCastleShort = false;
+    static boolean didCastleLong = false;
     static JPanel[][] boardPanel = new JPanel[8][8];
     static JFrame frame;
     static JPanel jp;
@@ -198,12 +199,16 @@ public class Board {
                 bKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
                 if (Pieces.blackCanCastleLong||Pieces.blackCanCastleShort){
                     castle(color, pieceOldSquare, pieceNewSquare);
+                    Pieces.blackCanCastleLong = false;
+                    Pieces.blackCanCastleShort = false;
                 }
             }
             if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getColor() == PColor.WHITE ){
                 wKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
                 if(Pieces.whiteCanCastleLong||Pieces.whiteCanCastleShort){
                     castle(color, pieceOldSquare, pieceNewSquare);
+                    Pieces.whiteCanCastleLong = false;
+                    Pieces.whiteCanCastleShort = false;
                 }
             }
         } 
@@ -222,7 +227,6 @@ public class Board {
         }
         Pieces.setEnPassentable(null);
         if (Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getType() == PType.PAWN && (pieceNewSquare.getY()==pieceOldSquare.getY() + 2 || pieceNewSquare.getY()==pieceOldSquare.getY() - 2)){
-            System.out.println(pieceNewSquare.toString() + " pessanable");
             Pieces.setEnPassentable(pieceNewSquare);
         }
     }

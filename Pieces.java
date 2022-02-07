@@ -135,21 +135,16 @@ public class Pieces {
                 if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
                     moveable.add(sq);
                 }
-                if(board[square.getX()][square.getY()].getColor() == PColor.WHITE){
-                    if((whiteCanCastleLong&&board[3][7]==null)&&board[2][7]==null&&board[1][7]==null&&threatsToPiece(p.getColor(), new Square(2, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(1, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(3, 7),null,null).isEmpty()&&threats.isEmpty()){
-                      moveable.add(new Square(2, 7));
-                    }
-                    if((whiteCanCastleShort&&board[5][7]==null)&&board[6][7]==null&&threatsToPiece(p.getColor(), new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(6, 7),null,null).isEmpty()&&threats.isEmpty()){
-                      moveable.add(new Square(6, 7));
-                    }
-                  }else{
-                      if((whiteCanCastleLong&&board[3][0]==null&&board[2][0]==null)&&board[1][0]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(3, 0),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(2, 0),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(1, 0),null,null).isEmpty()){
-                          moveable.add(new Square(2, 0));
-                        }
-                        if((whiteCanCastleShort&&board[5][0]==null)&&board[6][0]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(5, 7),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(6, 7),null,null).isEmpty()) {
-                          moveable.add(new Square(6, 0));
-                        }
-              }
+                boolean isWhite = board[square.getX()][square.getY()].getColor() == PColor.WHITE;
+                boolean castleShort = isWhite ? whiteCanCastleShort : blackCanCastleShort;
+                boolean castleLong = isWhite ? whiteCanCastleLong : blackCanCastleLong;
+                int yVal = isWhite ? 7 : 0;
+                if((castleLong&&board[3][yVal]==null)&&board[2][yVal]==null&&board[1][yVal]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(3, yVal),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(2, yVal),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(1, yVal),null,null).isEmpty()){
+                    moveable.add(new Square(2, yVal));
+                }
+                if((castleShort&&board[5][yVal]==null)&&board[6][yVal]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(5, yVal),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(6, yVal),null,null).isEmpty()){
+                    moveable.add(new Square(6, yVal));
+                }
                 break;
         }
         restrictMovementIfInCheck(square, moveable);
@@ -473,11 +468,11 @@ public class Pieces {
         Square newTurnKingSquare = (oldTurnColor == PColor.WHITE) ? Board.bKingSquare : Board.wKingSquare;
         Main.curTurn = otherColor;
         Board.addToMoveOrder(oldTurnColor, type, newSquare,oldSquare);
-        System.out.println("assessing threats to king on " + newTurnKingSquare.toString());
         threats = threatsToPiece(otherColor, newTurnKingSquare,pinners,pinned);
         if (updatePiecesPossibleMoves(otherColor)) System.out.println("no Moves");
     }
     private static boolean updatePiecesPossibleMoves(PColor color){
+        long start = System.nanoTime();
         boolean noPossibleMoves = true;
         for (int i = 0; i < 8; i++) for(int j = 0; j < 8; j++) {
             if (board[i][j] != null && board[i][j].getColor() == color){
@@ -488,6 +483,7 @@ public class Pieces {
                 }
             }
         }
+        // System.out.println("took "+((System.nanoTime()-start)/1000)+" microseconds to calculate all possible moves for " + ((color == PColor.BLACK) ? "black" : "white"));
         return noPossibleMoves;
     }
     private static ArrayList<Square> restrictMovementIfInCheck(Square square, ArrayList<Square> movement){
