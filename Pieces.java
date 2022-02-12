@@ -207,13 +207,13 @@ public class Pieces {
 
     private static ArrayList<Square> rookMovement(Square square,PColor color){
         ArrayList<Square> moveable = new ArrayList<>();
-        //y down (int i = y+1;i<8;i++) new Square(x,i)
+        //y down
         moveable.addAll(movementHelper(square, color, 0, 1));
-        //y up (int i =y-1;i>=0;i--) new Square(x,i)
+        //y up
         moveable.addAll(movementHelper(square, color, 0, -1));
-        //x right (int i =x+1;i<8;i++) new Square(i,y)
+        //x right
         moveable.addAll(movementHelper(square, color, 1, 0));
-        //x left (int i =x-1;i>=0;i--) new Square(i,y)
+        //x left
         moveable.addAll(movementHelper(square, color, -1, 0));
         return moveable;
     }
@@ -246,16 +246,16 @@ public class Pieces {
 
     private static ArrayList<Square> veticalNHorizontalThreatsAndPins(Square square,PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned){
         ArrayList<Square> moveable = new ArrayList<>();
-        //y down (int i = y+1;i<8;i++) new Square(x,i)
+        //y down
         Square yd = threatsHelper(square, color, pinners, pinned, 0, -1);
         if (yd != null) moveable.add(yd);
-        //y up (int i =y-1;i>=0;i--) new Square(x,i)
+        //y up 
         Square yu = threatsHelper(square, color, pinners, pinned, 0, 1);
         if (yu != null) moveable.add(yu);
-        //x right (int i =x+1;i<8;i++) new Square(i,y)
+        //x right
         Square xr = threatsHelper(square, color, pinners, pinned, 1, 0);
         if (xr != null) moveable.add(xr);
-        //x left (int i =x-1;i>=0;i--) new Square(i,y)
+        //x left
         Square xl = threatsHelper(square, color, pinners, pinned, -1, 0);
         if (xl != null) moveable.add(xl);
         return moveable;
