@@ -172,10 +172,8 @@ public class Pieces {
         if(square.getX() > 7 || square.getY() > 7 || square.getX() < 0 || square.getY() < 0){
             return false;
         }
-        if(board[square.getX()][square.getY()] != null && board[square.getX()][square.getY()].getColor() != taker){
-            return true;
-        }
-        return false;
+        return (board[square.getX()][square.getY()] != null && board[square.getX()][square.getY()].getColor() != taker);
+    
     }
     
     private static ArrayList<Square> knightMovement(Square square,PColor color,boolean movement){
