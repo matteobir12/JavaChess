@@ -316,15 +316,11 @@ public class Pieces {
         if(square.getY()+yDiff >=0 && square.getY()+yDiff < 8){
             if(square.getX()-1 >=0 && square.getX()-1 < 8){
                 Square s = new Square(square.getX()-1,square.getY()+yDiff);
-                if (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.PAWN && board[s.getX()][s.getY()].getColor() == pcolorOther(color)) {
-                    threats.add(s);
-                }
+                if (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.PAWN && board[s.getX()][s.getY()].getColor() == pcolorOther(color)) threats.add(s);
             }
             if(square.getX()+1 >=0 && square.getX()+1 < 8){
                 Square s = new Square(square.getX()+1,square.getY()+yDiff);
-                if (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.PAWN && board[s.getX()][s.getY()].getColor() == pcolorOther(color)){
-                    threats.add(s);
-                }
+                if (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.PAWN && board[s.getX()][s.getY()].getColor() == pcolorOther(color)) threats.add(s);
             }
         }
         return threats;
@@ -351,13 +347,9 @@ public class Pieces {
         attacker.copy(sq);
         int modx =1;
         int mody = 1;
-        if(attacker.getX()>toBlock.getX()){
-           modx = -1;
-        }
-        if(attacker.getY()>toBlock.getY()){
-            mody = -1;
-
-        }
+        if(attacker.getX()>toBlock.getX()) modx = -1;
+        
+        if(attacker.getY()>toBlock.getY()) mody = -1;
     
         while(!sq.equals(toBlock)){
            
@@ -371,12 +363,14 @@ public class Pieces {
 
     return false;
     }
+
     private static PColor pcolorOther(PColor color){
         if (color == PColor.BLACK){
             return PColor.WHITE;
         }
         return PColor.BLACK;
     }
+
     public static void setEnPassentable(Square enPassentable) {
         Pieces.enPassentable = enPassentable;
   }
@@ -391,6 +385,7 @@ public class Pieces {
         threats = threatsToPiece(otherColor, newTurnKingSquare,pinners,pinned);
         if (updatePiecesPossibleMoves(otherColor)) System.out.println(threats.isEmpty()?"Stalemate":"checkmate");
     }
+
     private static boolean updatePiecesPossibleMoves(PColor color){
         long start = System.nanoTime();
         boolean noPossibleMoves = true;
