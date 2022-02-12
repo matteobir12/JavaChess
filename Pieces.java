@@ -105,37 +105,29 @@ public class Pieces {
                 break;
             case KING:
             Square sq = new Square(square.getX(), square.getY() - 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+
                 sq = new Square(square.getX() + 1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+                
                 sq = new Square(square.getX() + 1, square.getY());
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+
                 sq = new Square(square.getX() + 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+
                 sq = new Square(square.getX(), square.getY() + 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+
                 sq = new Square(square.getX() - 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+
                 sq = new Square(square.getX() - 1, square.getY());
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+ 
                 sq = new Square(square.getX() -1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()){
-                    moveable.add(sq);
-                }
+                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
+
                 boolean isWhite = board[square.getX()][square.getY()].getColor() == PColor.WHITE;
                 boolean castleShort = isWhite ? whiteCanCastleShort : blackCanCastleShort;
                 boolean castleLong = isWhite ? whiteCanCastleLong : blackCanCastleLong;
@@ -157,7 +149,7 @@ public class Pieces {
         if(square.getX() > 7 || square.getY() > 7 || square.getX() < 0 || square.getY() < 0){
             return false;
         }
-        return ((board[square.getX()][square.getY()] == null) || (board[square.getX()][square.getY()].getColor() != taker));
+        return (board[square.getX()][square.getY()] == null) || (board[square.getX()][square.getY()].getColor() != taker);
         
     }
 
