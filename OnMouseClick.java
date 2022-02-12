@@ -3,9 +3,19 @@ import javax.swing.*;
 
 public class OnMouseClick {
     static Square lastClickedSquare;
+    static boolean waitingForPromotion = false;
+    private static Piece promotionPiece;
     public static void click(Square square){
         
         Board.removeCircles(); //deletes everything in circBoxes
+        if(waitingForPromotion) {
+            if(promotionPiece != null){
+                Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()] = promotionPiece;
+                Board.boardPanel[lastClickedSquare.getX()][lastClickedSquare.getY()].add(promotionPiece.getLabel());
+                waitingForPromotion = false;
+                promotionPiece = null;
+            }else return;
+        } 
 
         // if they clicked on their own piece
         if (Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].getColor() == Main.curTurn) {
@@ -48,6 +58,7 @@ public class OnMouseClick {
                     //switch turns and update move order
                     Pieces.pinned = new ArrayList<>();
                     Pieces.pinners = new ArrayList<>();
+                    lastClickedSquare = s;
                     Pieces.switchAndPrepareForNextTurn(Main.curTurn, type, s, lastClickedSquare);
                     
                     // System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
@@ -61,5 +72,8 @@ public class OnMouseClick {
             }
         }
         Board.updateBoard();    
+    }
+    public static void setPromotionPiece(Piece promotionPiece) {
+        OnMouseClick.promotionPiece = promotionPiece;
     }
 }

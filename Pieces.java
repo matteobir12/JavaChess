@@ -1,3 +1,4 @@
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -213,164 +214,89 @@ public class Pieces {
                 }
                 return moveable;
     }
-    
-    /**
-     * 
-     * @param square
-     * @param color
-     * @param movement
-     * @return
-     */
+
     private static ArrayList<Square> rookMovement(Square square,PColor color){
         ArrayList<Square> moveable = new ArrayList<>();
         //y down (int i = y+1;i<8;i++) new Square(x,i)
-        moveable.addAll(rookMovementHelper(square, color, false, false));
+        moveable.addAll(movementHelper(square, color, 0, 1));
         //y up (int i =y-1;i>=0;i--) new Square(x,i)
-        moveable.addAll(rookMovementHelper(square, color, false, true));
+        moveable.addAll(movementHelper(square, color, 0, -1));
         //x right (int i =x+1;i<8;i++) new Square(i,y)
-        moveable.addAll(rookMovementHelper(square, color, true, false));
+        moveable.addAll(movementHelper(square, color, 1, 0));
         //x left (int i =x-1;i>=0;i--) new Square(i,y)
-        moveable.addAll(rookMovementHelper(square, color, true, true));
+        moveable.addAll(movementHelper(square, color, -1, 0));
         return moveable;
-    }
-
-    private static ArrayList<Square> rookMovementHelper(Square square,PColor color, boolean xDirection, boolean negative) {
-        ArrayList<Square> moveable = new ArrayList<>();
-        int x = square.getX();
-        int y = square.getY();
-        int diff = 1;
-        if (negative) diff = -1;
-        int direction = y;
-        if (xDirection) direction = x;
-        for(int i = direction+diff;0<=i && i<8;i+=diff){
-            Square s = new Square(!xDirection ? x :i, xDirection ? y :i);
-            if(!checkIfMoveable(s, color)){
-                break;
-            }else{
-                moveable.add(s);
-                if (board[!xDirection ? x :i][xDirection ? y :i]!=null){
-                    break;
-                }
-            }
-        }
-        return moveable;
-    }
-    private static ArrayList<Square> veticalNHorizontalThreats(Square square,PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned){
-        ArrayList<Square> moveable = new ArrayList<>();
-        //y down (int i = y+1;i<8;i++) new Square(x,i)
-        Square yd = veticalNHorizontalThreatsHelper(square, color, false, false, pinners, pinned);
-        if (yd != null) moveable.add(yd);
-        //y up (int i =y-1;i>=0;i--) new Square(x,i)
-        Square yu = veticalNHorizontalThreatsHelper(square, color, false, true, pinners, pinned);
-        if (yu != null) moveable.add(yu);
-        //x right (int i =x+1;i<8;i++) new Square(i,y)
-        Square xr = veticalNHorizontalThreatsHelper(square, color, true, false, pinners, pinned);
-        if (xr != null) moveable.add(xr);
-        //x left (int i =x-1;i>=0;i--) new Square(i,y)
-        Square xl = veticalNHorizontalThreatsHelper(square, color, true, true, pinners, pinned);
-        if (xl != null) moveable.add(xl);
-        return moveable;
-    }
-    private static Square veticalNHorizontalThreatsHelper(Square square, PColor color, boolean xDirection, boolean negative, ArrayList<Square> pinners, ArrayList<Square> pinned) {
-        int x = square.getX();
-        int y = square.getY();
-        Square possiblePin = null;
-        int diff = 1;
-        if (negative) diff = -1;
-        int direction = y;
-        if (xDirection) direction = x;
-        for(int i = direction+diff;0<=i && i<8; i+=diff){
-            Square s = new Square(!xDirection ? x :i, xDirection ? y :i);
-            boolean squareHasTheKing = checkIfMoveable(s, pcolorOther(color)) && (board[s.getX()][s.getY()] != null &&board[s.getX()][s.getY()].getType() == PType.KING && board[s.getX()][s.getY()].getColor() == color);
-            //is empty or of opposite color and is not the current color king
-            if(checkIfMoveable(s, color) || squareHasTheKing) {
-                // check if its not empty and if the piece is a queen or rook
-                if (board[s.getX()][s.getY()] != null && !squareHasTheKing){ 
-                    if (board[s.getX()][s.getY()].getType() == PType.QUEEN||board[s.getX()][s.getY()].getType() == PType.ROOK) {
-                        if (possiblePin != null) { 
-                            pinned.add(possiblePin);
-                            if (pinners != null) pinners.add(s);
-                            return null;
-                        }
-                        return s;
-                    }
-                    return null;
-                }
-            //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
-            }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
-                possiblePin = s;
-            //walked out of bounds
-            } else {
-                return null;
-            }
-        }
-        return null;
     }
 
     private static ArrayList<Square> bishopMovement(Square square,PColor color){
         ArrayList<Square> moveable = new ArrayList<>();
-        //up right i = x+1;i<8;i++ new Square(i,y-i+x)
-        moveable.addAll(bishopMovementHelper(square, color, true, true));
-        // down right i = x+1;i<8;i++ new Square(i,y+i-x)
-        moveable.addAll(bishopMovementHelper(square, color, true, false));
-        // up left i = x-1 i>=0 i-- new Square(i,y-x+i)
-        moveable.addAll(bishopMovementHelper(square, color, false, true));
-        // down left i = x-1 i>=0 i-- new Square(i,y+x-i)
-        moveable.addAll(bishopMovementHelper(square, color, false, false));
+        //up right
+        moveable.addAll(movementHelper(square, color, 1, 1));
+        // down right
+        moveable.addAll(movementHelper(square, color, 1, -1));
+        // up left
+        moveable.addAll(movementHelper(square, color, -1, 1));
+        // down left
+        moveable.addAll(movementHelper(square, color, -1, -1));
         return moveable;
     }
-    private static ArrayList<Square> bishopMovementHelper(Square square, PColor color, boolean right, boolean up){
+
+    private static ArrayList<Square> movementHelper(Square square, PColor color, int xDiff, int yDiff){
         ArrayList<Square> moveable = new ArrayList<>();
-        int x = square.getX();
-        int y = square.getY();
-        int xDiff = -1;
-        int yDiff = -1;
-        if (right) xDiff = 1;
-        if (up) yDiff = 1;
-        for(int i = x+xDiff;i>=0 && i < 8;i+=xDiff) {
-            Square s = new Square(i,y+(x*yDiff)-(i*yDiff));
-            if(checkIfMoveable(s, color)){
-                moveable.add(s);
-                if (board[s.getX()][s.getY()]!=null) {
-                    break;
-                }
-            } else {
+        Square s = new Square(square.getX()+xDiff,square.getY()+yDiff);
+        while(checkIfMoveable(s, color)){
+            moveable.add(s);
+            if (board[s.getX()][s.getY()]!=null) {
                 break;
             }
+            s = new Square(s.getX()+xDiff,s.getY()+yDiff);
         }
+        return moveable;
+    }
+
+    private static ArrayList<Square> veticalNHorizontalThreatsAndPins(Square square,PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned){
+        ArrayList<Square> moveable = new ArrayList<>();
+        //y down (int i = y+1;i<8;i++) new Square(x,i)
+        Square yd = threatsHelper(square, color, pinners, pinned, 0, -1);
+        if (yd != null) moveable.add(yd);
+        //y up (int i =y-1;i>=0;i--) new Square(x,i)
+        Square yu = threatsHelper(square, color, pinners, pinned, 0, 1);
+        if (yu != null) moveable.add(yu);
+        //x right (int i =x+1;i<8;i++) new Square(i,y)
+        Square xr = threatsHelper(square, color, pinners, pinned, 1, 0);
+        if (xr != null) moveable.add(xr);
+        //x left (int i =x-1;i>=0;i--) new Square(i,y)
+        Square xl = threatsHelper(square, color, pinners, pinned, -1, 0);
+        if (xl != null) moveable.add(xl);
         return moveable;
     }
 
     private static ArrayList<Square> diagonalThreatsAndPins(Square square, PColor color, ArrayList<Square> pinners, ArrayList<Square> pins){
         ArrayList<Square> possibleThreats = new ArrayList<>();
-        //up right i = x+1;i<8;i++ new Square(i,y-i+x)
-        Square ur = diagThreatsHelper(square, color, pinners, pins, true, true);
+        //up right
+        Square ur = threatsHelper(square, color, pinners, pins, 1, 1);
         if (ur != null) possibleThreats.add(ur);
-        // down right i = x+1;i<8;i++ new Square(i,y+i-x)
-        Square dr = diagThreatsHelper(square, color, pinners, pins, true, false);
+        // down right
+        Square dr = threatsHelper(square, color, pinners, pins, 1, -1);
         if (dr != null) possibleThreats.add(dr);
-        // up left i = x-1 i>=0 i-- new Square(i,y-x+i)
-        Square ul = diagThreatsHelper(square, color, pinners, pins, false, true);
+        // up left
+        Square ul = threatsHelper(square, color, pinners, pins, -1, 1);
         if (ul != null) possibleThreats.add(ul);
-        // down left i = x-1 i>=0 i-- new Square(i,y+x-i)
-        Square dl = diagThreatsHelper(square, color, pinners, pins, false, false);
+        // down left
+        Square dl = threatsHelper(square, color, pinners, pins, -1, -1);
         if (dl != null) possibleThreats.add(dl);
         return possibleThreats;
     }
-    private static Square diagThreatsHelper(Square square, PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned, boolean right, boolean up){
-        int x = square.getX();
-        int y = square.getY();
+    private static Square threatsHelper(Square square, PColor color, ArrayList<Square> pinners, ArrayList<Square> pinned, int xDiff, int yDiff){
         Square possiblePin = null;
-        int xDiff = -1;
-        int yDiff = -1;
-        if (right) xDiff = 1;
-        if (up) yDiff = 1;
-        for(int i = x+xDiff;i>=0 && i < 8;i+=xDiff) {
-            Square s = new Square(i,y+(x*yDiff)-(i*yDiff));
-            boolean squareHasTheKing = checkIfMoveable(s, pcolorOther(color)) && (board[s.getX()][s.getY()] != null &&board[s.getX()][s.getY()].getType() == PType.KING && board[s.getX()][s.getY()].getColor() == color);
+        Square s = new Square(square.getX()+xDiff,square.getY()+yDiff);
+        while(true){
+            boolean squareHasTheKing = checkIfMoveable(s, pcolorOther(color)) && (board[s.getX()][s.getY()] != null && board[s.getX()][s.getY()].getType() == PType.KING && board[s.getX()][s.getY()].getColor() == color);
+            //is empty or of opposite color and is not the current color king
             if(checkIfMoveable(s, color) || squareHasTheKing){
+                // check if its not empty and if the piece is a piece that can pin in this situation
                 if (board[s.getX()][s.getY()] != null && !squareHasTheKing){
-                        if (board[s.getX()][s.getY()].getType()==PType.QUEEN||board[s.getX()][s.getY()].getType()==PType.BISHOP) {
+                        if (board[s.getX()][s.getY()].getType()==PType.QUEEN|| ((xDiff!=0 && yDiff !=0) ? board[s.getX()][s.getY()].getType()==PType.BISHOP: board[s.getX()][s.getY()].getType()==PType.ROOK)) {
                             if (possiblePin != null){
                                 pinned.add(possiblePin);
                                 if (pinners != null) pinners.add(s);
@@ -379,17 +305,19 @@ public class Pieces {
                             return s;
                         }
                         return null;
+                        
                 }
             //checks if the square is in bounds and is populated with a piece of the same color and we care about pinned pieces
             }else if (checkIfMoveable(s, pcolorOther(color)) && pinned != null){
+                if (possiblePin!=null) return null;
                 possiblePin = s;
-            //walked out of bounds
+            //walked out of bounds or we don't care about pinned pieces
             } else {
                 return null;
+
             }
-            
+            s = new Square(s.getX()+xDiff,s.getY()+yDiff);
         }
-        return null;
     }
 
     private static ArrayList<Square> pawnThreats(Square square, PColor color){
@@ -414,7 +342,7 @@ public class Pieces {
 
     public static ArrayList<Square> threatsToPiece(PColor color,Square square, ArrayList<Square> pinners, ArrayList<Square> pinned){
         ArrayList<Square> attackers = knightMovement(square, color, false);
-        attackers.addAll(veticalNHorizontalThreats(square, color, pinners, pinned));
+        attackers.addAll(veticalNHorizontalThreatsAndPins(square, color, pinners, pinned));
         attackers.addAll(diagonalThreatsAndPins(square, color, pinners, pinned));
         attackers.addAll(pawnThreats(square, color));
         return attackers;
@@ -471,7 +399,7 @@ public class Pieces {
         Main.curTurn = otherColor;
         Board.addToMoveOrder(oldTurnColor, type, newSquare,oldSquare);
         threats = threatsToPiece(otherColor, newTurnKingSquare,pinners,pinned);
-        if (updatePiecesPossibleMoves(otherColor)) System.out.println("no Moves");
+        if (updatePiecesPossibleMoves(otherColor)) System.out.println(threats.isEmpty()?"Stalemate":"checkmate");
     }
     private static boolean updatePiecesPossibleMoves(PColor color){
         long start = System.nanoTime();

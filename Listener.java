@@ -32,5 +32,22 @@ public class Listener extends JPanel {
         });
 
     }
+    public Listener(Piece piece, int x, int y,boolean isPromotion) {
+        Border blackline = BorderFactory.createLineBorder(Color.black);
+        this.setBackground( Color.white);
+        this.setBounds(x, y, 107, 107);
+        this.setBorder(blackline);
+    
+        addMouseListener(new MouseAdapter() { 
+            @Override
+            public void mousePressed(MouseEvent me) {
+                Board.clickedPieceFromSelector(piece);
+                if (isPromotion){
+                    OnMouseClick.setPromotionPiece(piece);
+                }
+            }
+        });
+
+    }
 
 }

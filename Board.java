@@ -32,39 +32,22 @@ public class Board {
 
         
 
-        frame.setSize(h+100,l+100); //pixel size of frame in width then height
+        frame.setSize(h+300,l+300); //pixel size of frame in width then height
        
         jp.setLayout(null);//Out.  Back in.
         jp.setBackground(new java.awt.Color(100, 255, 100));
         frame.add(jp); 
 
         //Move order to txt button
-        JButton b = new JButton("Save mv Order");  
-        b.setBounds(l +50,h-50,115,30);  
-        b.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){  
-                try (PrintWriter out = new PrintWriter("pgn.txt")) {
-                    out.println(moveOrder);
-                }catch (FileNotFoundException x){
-                    System.out.println("no file");
-                }
-            }  
-        });
-        jp.add(b);  
+        jp.add(createMoveOrderJButton());  
         //move order jp
-        JPanel moveOrderJP = new JPanel();
-        moveOrderJP.setBounds(l+50, h-300, 215, 200);
-        textLabel = new JTextArea( "", 6, 20);
-        textLabel.setLineWrap(true);
-        textLabel.setWrapStyleWord(true);
-        textLabel.setOpaque(false);
-        textLabel.setEditable(false);
-
-        moveOrderJP.add(textLabel);
+        jp.add(createMoveOrderJLabel());
+        // piece selector
+        //createPieceSelectorJPanel(PColor.WHITE,false);
+       
         
         //textLabel.setFont(new Font("Verdana",1,20));
-        moveOrderJP.add(textLabel);
-        jp.add(moveOrderJP);
+
 
 
         for(int i=0;i<8;i++){
@@ -278,6 +261,59 @@ public class Board {
                 Pieces.blackCanCastleShort = false;
             }
         }
+    }
+    private static JPanel createMoveOrderJLabel(){
+        JPanel moveOrderJP = new JPanel();
+        moveOrderJP.setBounds(l+50, h-300, 215, 200);
+        textLabel = new JTextArea( "", 6, 20);
+        textLabel.setLineWrap(true);
+        textLabel.setWrapStyleWord(true);
+        textLabel.setOpaque(false);
+        textLabel.setEditable(false);
+        moveOrderJP.add(textLabel);
+        return moveOrderJP;
+
+    }
+    private static JButton createMoveOrderJButton(){
+        JButton b = new JButton("Save mv Order");  
+        b.setBounds(l +50,h-50,150,30);  
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){  
+                try (PrintWriter out = new PrintWriter("pgn.txt")) {
+                    out.println(moveOrder);
+                }catch (FileNotFoundException x){
+                    System.out.println("no file");
+                }
+            }  
+        });
+        return b;
+    }
+    private static ArrayList<JPanel> createPieceSelectorJPanel(PColor color, boolean isPromotion){
+        ArrayList<JPanel> panels = new ArrayList<>();
+        int height = isPromotion ? 200 : 300;
+        int squareSize = 107;
+        
+        Piece[] pieceOrder = {new Piece(color,PType.QUEEN), new Piece(color,PType.ROOK), new Piece(color,PType.KNIGHT), new Piece(color,PType.BISHOP), new Piece(color, PType.KING), new Piece(color,PType.PAWN)}; 
+        for(int i=0;i< (isPromotion ? 2 :3);i++) for(int j=0;j<2;j++){
+                JPanel rectangle = new Listener(pieceOrder[j+(i*2)],l+50+(squareSize*(j%2)), h-((350+height)-(squareSize*(i))),isPromotion);
+                String s = "./assets/";
+                String col = pieceOrder[j+(i*2)].getColor().toString().toLowerCase();
+                String type = pieceOrder[j+(i*2)].getType().toString().toLowerCase();
+                JLabel l = new JLabel(new ImageIcon(s + col + "_" + type + ".png"));
+                rectangle.add(l);
+                jp.add(rectangle);
+                panels.add(rectangle);
+            }
+        
+        return panels;
+
+    }
+    public static void clickedPieceFromSelector(Piece piece){
+        String string = "./assets/";
+        String color = piece.getColor().toString().toLowerCase();
+        String type = piece.getType().toString().toLowerCase();
+        JLabel l = new JLabel(new ImageIcon(string+color+"_"+type+".png"));
+        piece.setLabel(l);
     }
 
 }
