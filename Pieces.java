@@ -1,4 +1,3 @@
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -331,6 +330,7 @@ public class Pieces {
         attackers.addAll(veticalNHorizontalThreatsAndPins(square, color, pinners, pinned));
         attackers.addAll(diagonalThreatsAndPins(square, color, pinners, pinned));
         attackers.addAll(pawnThreats(square, color));
+        for(int i =0; i< ((pinned!=null)?pinned.size():0);i++) System.out.println(pinned.toString());
         return attackers;
 
     }
@@ -377,7 +377,7 @@ public class Pieces {
     public static Square getEnPassentable() {
         return enPassentable;
   }
-    public static void switchAndPrepareForNextTurn(PColor oldTurnColor, String type, Square newSquare, Square oldSquare){
+    public static void switchAndPrepareForNextTurn(PColor oldTurnColor, PType type, Square newSquare, Square oldSquare){
         PColor otherColor = pcolorOther(oldTurnColor);
         Square newTurnKingSquare = (oldTurnColor == PColor.WHITE) ? Board.bKingSquare : Board.wKingSquare;
         Main.curTurn = otherColor;

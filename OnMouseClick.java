@@ -4,19 +4,12 @@ import javax.swing.*;
 public class OnMouseClick {
     static Square lastClickedSquare;
     static boolean waitingForPromotion = false;
-    private static Piece promotionPiece;
     public static void click(Square square){
-        
-        Board.removeCircles(); //deletes everything in circBoxes
-        if(waitingForPromotion) {
-            if(promotionPiece != null){
-                Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()] = promotionPiece;
-                Board.boardPanel[lastClickedSquare.getX()][lastClickedSquare.getY()].add(promotionPiece.getLabel());
-                waitingForPromotion = false;
-                promotionPiece = null;
-            }else return;
-        } 
 
+        if(waitingForPromotion)return;
+        
+
+        Board.removeCircles(); //deletes everything in circBoxes
         // if they clicked on their own piece
         if (Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].getColor() == Main.curTurn) {
             
@@ -32,7 +25,7 @@ public class OnMouseClick {
         }else{ //if they didnt click on their piece they must have clicked an enemy piece or a free square
             
              if(lastClickedSquare !=null && Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()]!=null) for(Square s: Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getPossibleMoves()){
-                
+                //System.out.println(s.toString());
                 if (square.equals(s)){
                     // delete old piece(s) location
                     Board.circBoxes.add(Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getLabel());
@@ -58,8 +51,15 @@ public class OnMouseClick {
                     //switch turns and update move order
                     Pieces.pinned = new ArrayList<>();
                     Pieces.pinners = new ArrayList<>();
-                    lastClickedSquare = s;
-                    Pieces.switchAndPrepareForNextTurn(Main.curTurn, type, s, lastClickedSquare);
+                    if(Pieces.board[s.getX()][s.getY()].getType() == PType.PAWN && (s.getY()==7||s.getY()==0)){
+                        System.out.println("waiting for promo");
+                        lastClickedSquare = s;
+                        waitingForPromotion = true;
+                        Board.createPieceSelectorJPanel(Main.curTurn,true);
+                    }else{
+                        Pieces.switchAndPrepareForNextTurn(Main.curTurn, Pieces.board[s.getX()][s.getY()].getType(), s, lastClickedSquare);
+                        lastClickedSquare = null;
+                    }
                     
                     // System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
                     // System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
@@ -74,6 +74,14 @@ public class OnMouseClick {
         Board.updateBoard();    
     }
     public static void setPromotionPiece(Piece promotionPiece) {
-        OnMouseClick.promotionPiece = promotionPiece;
+        Board.circBoxes.add(Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getLabel());
+        Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()] = promotionPiece;
+        Board.boardPanel[lastClickedSquare.getX()][lastClickedSquare.getY()].add(promotionPiece.getLabel());
+        waitingForPromotion = false;
+        Pieces.switchAndPrepareForNextTurn(Main.curTurn, PType.PAWN, lastClickedSquare, lastClickedSquare);
+        lastClickedSquare = null;
+        Board.removePieceSelectorPanel();
+        Board.removeCircles();
+        Board.updateBoard();
     }
 }

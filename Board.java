@@ -24,6 +24,7 @@ public class Board {
     static ArrayList<Square> kingThreats;
     static Square wKingSquare;
     static Square bKingSquare;
+    static ArrayList<JPanel> pieceSelectorPanel;
 
     public static void makeNewBoard(){
         frame = new JFrame();
@@ -106,7 +107,7 @@ public class Board {
     }
 
 
-    public static void addToMoveOrder(PColor c,String type,Square s,Square clickedSquare){
+    public static void addToMoveOrder(PColor c,PType type,Square s,Square clickedSquare){
         if(c ==PColor.WHITE ){
             moveOrder += moveNumb + ".";
         
@@ -127,14 +128,14 @@ public class Board {
         char x = (char)(s.getX()+97);
         char y = (char)((8-s.getY())+48);
         //not a pawn
-        if(type.charAt(0)!='p') {
-           if(type.equals("knight")) {
+        if(type != PType.PAWN) {
+           if(type==PType.KNIGHT) {
                 moveOrder += "n";
                 otherPieceCanMove( s,  clickedSquare);
            }else{
-           moveOrder += type.charAt(0);
+           moveOrder += type.toString().charAt(0);
             }
-            if(type.charAt(0)=='r') {
+            if(type==PType.ROOK) {
                 otherPieceCanMove( s,  clickedSquare);
             }
             //was it takes?
@@ -288,7 +289,7 @@ public class Board {
         });
         return b;
     }
-    private static ArrayList<JPanel> createPieceSelectorJPanel(PColor color, boolean isPromotion){
+    public static ArrayList<JPanel> createPieceSelectorJPanel(PColor color, boolean isPromotion){
         ArrayList<JPanel> panels = new ArrayList<>();
         int height = isPromotion ? 200 : 300;
         int squareSize = 107;
@@ -304,7 +305,7 @@ public class Board {
                 jp.add(rectangle);
                 panels.add(rectangle);
             }
-        
+        pieceSelectorPanel = panels;
         return panels;
 
     }
@@ -314,6 +315,9 @@ public class Board {
         String type = piece.getType().toString().toLowerCase();
         JLabel l = new JLabel(new ImageIcon(string+color+"_"+type+".png"));
         piece.setLabel(l);
+    }
+    public static void removePieceSelectorPanel(){
+        if(pieceSelectorPanel!=null) for(JPanel j:pieceSelectorPanel) jp.remove(j);
     }
 
 }
