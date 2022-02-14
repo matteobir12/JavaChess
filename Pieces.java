@@ -330,7 +330,6 @@ public class Pieces {
         attackers.addAll(veticalNHorizontalThreatsAndPins(square, color, pinners, pinned));
         attackers.addAll(diagonalThreatsAndPins(square, color, pinners, pinned));
         attackers.addAll(pawnThreats(square, color));
-        for(int i =0; i< ((pinned!=null)?pinned.size():0);i++) System.out.println(pinned.toString());
         return attackers;
 
     }

@@ -25,7 +25,6 @@ public class OnMouseClick {
         }else{ //if they didnt click on their piece they must have clicked an enemy piece or a free square
             
              if(lastClickedSquare !=null && Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()]!=null) for(Square s: Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getPossibleMoves()){
-                //System.out.println(s.toString());
                 if (square.equals(s)){
                     // delete old piece(s) location
                     Board.circBoxes.add(Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getLabel());
@@ -52,7 +51,6 @@ public class OnMouseClick {
                     Pieces.pinned = new ArrayList<>();
                     Pieces.pinners = new ArrayList<>();
                     if(Pieces.board[s.getX()][s.getY()].getType() == PType.PAWN && (s.getY()==7||s.getY()==0)){
-                        System.out.println("waiting for promo");
                         lastClickedSquare = s;
                         waitingForPromotion = true;
                         Board.createPieceSelectorJPanel(Main.curTurn,true);
@@ -61,11 +59,6 @@ public class OnMouseClick {
                         lastClickedSquare = null;
                     }
                     
-                    // System.out.println("white can castle long " + Pieces.whiteCanCastleLong);
-                    // System.out.println("white can castle short " + Pieces.whiteCanCastleShort);
-                    // System.out.println("black can castle long " + Pieces.blackCanCastleLong);
-                    // System.out.println("black can castle short " + Pieces.blackCanCastleShort);
-
                     break;  
 
                 }
