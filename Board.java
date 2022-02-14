@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.awt.Container;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-
+import java.awt.Dimension;
 
 
 public class Board {
@@ -21,9 +21,6 @@ public class Board {
     static ArrayList<JLabel> circBoxes = new ArrayList<>();
     static String moveOrder="";
     static Piece enpassant;
-    static ArrayList<Square> kingThreats;
-    static Square wKingSquare;
-    static Square bKingSquare;
     static ArrayList<JPanel> pieceSelectorPanel;
 
     public static void makeNewBoard(){
@@ -176,11 +173,18 @@ public class Board {
        
         
     }
+    public static void createGameEndText(String text){
+        JLabel label = new JLabel(text);
+        Dimension size = label.getPreferredSize();
+        label.setBounds(l+50, h-900, size.width, size.height);
+        jp.add(label);
+        updateBoard();
+    }
     public static void afterMove(Square pieceOldSquare, Square pieceNewSquare, String color){
         //if king moved test if it was a castle and move the rook too. also update the king square.
         if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getType()==PType.KING){
             if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getColor() == PColor.BLACK){
-                bKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
+                Pieces.bKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
                 if (Pieces.blackCanCastleLong||Pieces.blackCanCastleShort){
                     castle(color, pieceOldSquare, pieceNewSquare);
                     Pieces.blackCanCastleLong = false;
@@ -188,7 +192,7 @@ public class Board {
                 }
             }
             if(Pieces.board[pieceOldSquare.getX()][pieceOldSquare.getY()].getColor() == PColor.WHITE ){
-                wKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
+                Pieces.wKingSquare = new Square(pieceNewSquare.getX(), pieceNewSquare.getY());
                 if(Pieces.whiteCanCastleLong||Pieces.whiteCanCastleShort){
                     castle(color, pieceOldSquare, pieceNewSquare);
                     Pieces.whiteCanCastleLong = false;

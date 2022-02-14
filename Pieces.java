@@ -8,6 +8,8 @@ public class Pieces {
     static boolean whiteCanCastleShort;
     static boolean blackCanCastleLong;
     static boolean blackCanCastleShort;
+    static Square wKingSquare;
+    static Square bKingSquare;
     static ArrayList<Square> threats;
     static ArrayList<Square> pinned = new ArrayList<>();
     static ArrayList<Square> pinners = new ArrayList<>();
@@ -32,8 +34,8 @@ public class Pieces {
         blackCanCastleShort=true;
          blackCanCastleLong = true;
         PColor curColor = null;
-        Board.bKingSquare = new Square(4, 0);
-        Board.wKingSquare = new Square(4, 7);
+        bKingSquare = new Square(4, 0);
+        wKingSquare = new Square(4, 7);
 
         for(int i = 0; i < 8; i+=7){
             if(i == 0){
@@ -103,40 +105,7 @@ public class Pieces {
             moveable.addAll(bishopMovement(square, p.getColor()));
                 break;
             case KING:
-            Square sq = new Square(square.getX(), square.getY() - 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-
-                sq = new Square(square.getX() + 1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-                
-                sq = new Square(square.getX() + 1, square.getY());
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-
-                sq = new Square(square.getX() + 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-
-                sq = new Square(square.getX(), square.getY() + 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-
-                sq = new Square(square.getX() - 1, square.getY() + 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-
-                sq = new Square(square.getX() - 1, square.getY());
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
- 
-                sq = new Square(square.getX() -1, square.getY() - 1);
-                if(checkIfMoveable(sq, p.getColor())&&threatsToPiece(p.getColor(), sq,null,null).isEmpty()) moveable.add(sq);
-
-                boolean isWhite = board[square.getX()][square.getY()].getColor() == PColor.WHITE;
-                boolean castleShort = isWhite ? whiteCanCastleShort : blackCanCastleShort;
-                boolean castleLong = isWhite ? whiteCanCastleLong : blackCanCastleLong;
-                int yVal = isWhite ? 7 : 0;
-                if((castleLong&&board[3][yVal]==null)&&board[2][yVal]==null&&board[1][yVal]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(3, yVal),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(2, yVal),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(1, yVal),null,null).isEmpty()){
-                    moveable.add(new Square(2, yVal));
-                }
-                if((castleShort&&board[5][yVal]==null)&&board[6][yVal]==null&&threats.isEmpty()&&threatsToPiece(p.getColor(), new Square(5, yVal),null,null).isEmpty()&&threatsToPiece(p.getColor(), new Square(6, yVal),null,null).isEmpty()){
-                    moveable.add(new Square(6, yVal));
-                }
+            moveable.addAll(kingMovement(square, p.getColor(), true));
                 break;
         }
         restrictMovementIfInCheck(square, moveable);
@@ -165,6 +134,53 @@ public class Pieces {
         }
         return (board[square.getX()][square.getY()] != null && board[square.getX()][square.getY()].getColor() != taker);
     
+    }
+
+    private static ArrayList<Square> kingMovement(Square square, PColor taker,boolean firstCall){
+        ArrayList<Square> moveable = new ArrayList<>();
+        Square sq = new Square(square.getX(), square.getY() - 1);
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        sq = new Square(square.getX() + 1, square.getY() - 1);
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        sq = new Square(square.getX() + 1, square.getY());
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        sq = new Square(square.getX() + 1, square.getY() + 1);
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        sq = new Square(square.getX(), square.getY() + 1);
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        sq = new Square(square.getX() - 1, square.getY() + 1);
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        sq = new Square(square.getX() - 1, square.getY());
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+ 
+        sq = new Square(square.getX() -1, square.getY() - 1);
+        if(checkIfMoveable(sq, taker)&&threatsToPiece(taker, sq,null,null).isEmpty()) moveable.add(sq);
+
+        //if the kings are close to each other
+
+        if (firstCall){
+            boolean isWhite = board[square.getX()][square.getY()].getColor() == PColor.WHITE;
+            boolean castleShort = isWhite ? whiteCanCastleShort : blackCanCastleShort;
+            boolean castleLong = isWhite ? whiteCanCastleLong : blackCanCastleLong;
+            int yVal = isWhite ? 7 : 0;
+            if((castleLong&&board[3][yVal]==null)&&board[2][yVal]==null&&board[1][yVal]==null&&threats.isEmpty()&&threatsToPiece(taker, new Square(3, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(2, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(1, yVal),null,null).isEmpty()){
+                moveable.add(new Square(2, yVal));
+            }
+            if((castleShort&&board[5][yVal]==null)&&board[6][yVal]==null&&threats.isEmpty()&&threatsToPiece(taker, new Square(5, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(6, yVal),null,null).isEmpty()){
+                moveable.add(new Square(6, yVal));
+            }
+            if(bKingSquare.getX()-wKingSquare.getX()<=2 && bKingSquare.getX()-wKingSquare.getX()>=-2&&bKingSquare.getY()-wKingSquare.getY()<=2 && bKingSquare.getY()-wKingSquare.getY()>=-2){
+                moveable.removeAll(kingMovement(isWhite? bKingSquare:wKingSquare, taker, false));
+            }
+        }
+
+        return moveable;
     }
     
     private static ArrayList<Square> knightMovement(Square square,PColor color,boolean movement){
@@ -378,11 +394,11 @@ public class Pieces {
   }
     public static void switchAndPrepareForNextTurn(PColor oldTurnColor, PType type, Square newSquare, Square oldSquare){
         PColor otherColor = pcolorOther(oldTurnColor);
-        Square newTurnKingSquare = (oldTurnColor == PColor.WHITE) ? Board.bKingSquare : Board.wKingSquare;
+        Square newTurnKingSquare = (oldTurnColor == PColor.WHITE) ? bKingSquare : wKingSquare;
         Main.curTurn = otherColor;
         Board.addToMoveOrder(oldTurnColor, type, newSquare,oldSquare);
         threats = threatsToPiece(otherColor, newTurnKingSquare,pinners,pinned);
-        if (updatePiecesPossibleMoves(otherColor)) System.out.println(threats.isEmpty()?"Stalemate":"checkmate");
+        if (updatePiecesPossibleMoves(otherColor)) Board.createGameEndText(threats.isEmpty()?"Stalemate":oldTurnColor.toString()+" wins");
     }
 
     private static boolean updatePiecesPossibleMoves(PColor color){
@@ -404,7 +420,7 @@ public class Pieces {
         if (threats!=null && !threats.isEmpty() && Pieces.board[square.getX()][square.getY()].getType() != PType.KING) {
             //by one attacker
             if (threats.size()==1){
-                Square curking = (Main.curTurn == PColor.BLACK) ? Board.bKingSquare : Board.wKingSquare;
+                Square curking = (Main.curTurn == PColor.BLACK) ? bKingSquare : wKingSquare;
             boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].getType()==PType.KNIGHT);
             Iterator<Square> iter = movement.iterator(); 
             while(iter.hasNext()){
@@ -416,7 +432,7 @@ public class Pieces {
                 iter.remove();
             }
             }else{
-                if(!square.equals(Board.bKingSquare) && !square.equals(Board.wKingSquare)){
+                if(!square.equals(bKingSquare) && !square.equals(wKingSquare)){
                     for(int i = 0; i<movement.size(); i++){
                         movement.remove(i);
                     }
@@ -431,7 +447,7 @@ public class Pieces {
             for(int i=0; i<pinned.size();i++){
                 //is it the piece they clicked
                 if(square.equals(pinned.get(i))){
-                    Square curking = (Main.curTurn == PColor.BLACK) ? Board.bKingSquare : Board.wKingSquare ; 
+                    Square curking = (Main.curTurn == PColor.BLACK) ? bKingSquare : wKingSquare ; 
                     Iterator<Square> iter = movement.iterator(); 
                     while(iter.hasNext()){
                         Square tmpS = iter.next();
