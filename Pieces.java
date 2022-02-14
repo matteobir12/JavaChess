@@ -3,7 +3,7 @@ import java.util.Iterator;
 
 public class Pieces {
 
-    public static Piece[][] board = new Piece[8][8];
+    private static Piece[][] board = new Piece[8][8];
     static boolean whiteCanCastleLong;
     static boolean whiteCanCastleShort;
     static boolean blackCanCastleLong;
@@ -27,7 +27,17 @@ public class Pieces {
      Pieces(){
         initBoard();
     }
-
+    public static Piece getBoardXY(int x, int y) {
+        return board[x][y];
+    }public static Piece getBoardSquare(Square s) {
+        return board[s.getX()][s.getY()];
+    }
+    public static void setBoardXY(int x, int y, Piece piece) {
+        board[x][y] = piece;
+    }
+    public static void setBoardSquare(Square s, Piece piece) {
+        board[s.getX()][s.getY()] = piece;
+    }
     public static void initBoard(){
         whiteCanCastleShort=true;
         whiteCanCastleLong = true;

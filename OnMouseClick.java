@@ -11,11 +11,11 @@ public class OnMouseClick {
 
         Board.removeCircles(); //deletes everything in circBoxes
         // if they clicked on their own piece
-        if (Pieces.board[square.getX()][square.getY()] != null && Pieces.board[square.getX()][square.getY()].getColor() == Main.curTurn) {
+        if (Pieces.getBoardSquare(square) != null && Pieces.getBoardSquare(square).getColor() == Main.curTurn) {
             
             lastClickedSquare = square;
-            for(Square s: Pieces.board[square.getX()][square.getY()].getPossibleMoves()){
-                if(Pieces.board[s.getX()][s.getY()]==null){
+            for(Square s: Pieces.getBoardSquare(square).getPossibleMoves()){
+                if(Pieces.getBoardSquare(s)==null){
                     Board.displayPossibleMoves(s);
                 }else{
                 //TODO some kind of takes indicator
@@ -24,38 +24,38 @@ public class OnMouseClick {
             }
         }else{ //if they didnt click on their piece they must have clicked an enemy piece or a free square
             
-             if(lastClickedSquare !=null && Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()]!=null) for(Square s: Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getPossibleMoves()){
+             if(lastClickedSquare !=null && Pieces.getBoardSquare(lastClickedSquare)!=null) for(Square s: Pieces.getBoardSquare(lastClickedSquare).getPossibleMoves()){
                 if (square.equals(s)){
                     // delete old piece(s) location
-                    Board.circBoxes.add(Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getLabel());
-                    if(Pieces.board[square.getX()][square.getY()] != null){
-                        Board.circBoxes.add(Pieces.board[square.getX()][square.getY()].getLabel()); 
+                    Board.circBoxes.add(Pieces.getBoardSquare(lastClickedSquare).getLabel());
+                    if(Pieces.getBoardSquare(square) != null){
+                        Board.circBoxes.add(Pieces.getBoardSquare(square).getLabel()); 
                         Board.ex = true;
                     }
                     Board.removeCircles();
                     
                     // change board in pieces clickedSquare is old square s is new square
                     String string = "./assets/";
-                    String color = Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getColor().toString().toLowerCase();////
+                    String color = Pieces.getBoardSquare(lastClickedSquare).getColor().toString().toLowerCase();////
                     Board.afterMove(lastClickedSquare, s, color);
-                    String type = Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getType().toString().toLowerCase();
+                    String type = Pieces.getBoardSquare(lastClickedSquare).getType().toString().toLowerCase();
                     JLabel l = new JLabel(new ImageIcon(string+color+"_"+type+".png"));
-                    Pieces.board[s.getX()][s.getY()] = Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()];
-                    Pieces.board[s.getX()][s.getY()].setLabel(l);
+                    Pieces.setBoardSquare(s, Pieces.getBoardSquare(lastClickedSquare));
+                    Pieces.getBoardSquare(s).setLabel(l);
                     Board.boardPanel[s.getX()][s.getY()].add(l);
 
                     //reset things
-                    Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()] = null;
+                    Pieces.setBoardSquare(lastClickedSquare, null);
                     
                     //switch turns and update move order
                     Pieces.pinned = new ArrayList<>();
                     Pieces.pinners = new ArrayList<>();
-                    if(Pieces.board[s.getX()][s.getY()].getType() == PType.PAWN && (s.getY()==7||s.getY()==0)){
+                    if(Pieces.getBoardSquare(s).getType() == PType.PAWN && (s.getY()==7||s.getY()==0)){
                         lastClickedSquare = s;
                         waitingForPromotion = true;
                         Board.createPieceSelectorJPanel(Main.curTurn,true);
                     }else{
-                        Pieces.switchAndPrepareForNextTurn(Main.curTurn, Pieces.board[s.getX()][s.getY()].getType(), s, lastClickedSquare);
+                        Pieces.switchAndPrepareForNextTurn(Main.curTurn, Pieces.getBoardSquare(s).getType(), s, lastClickedSquare);
                         lastClickedSquare = null;
                     }
                     
@@ -67,8 +67,8 @@ public class OnMouseClick {
         Board.updateBoard();    
     }
     public static void setPromotionPiece(Piece promotionPiece) {
-        Board.circBoxes.add(Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()].getLabel());
-        Pieces.board[lastClickedSquare.getX()][lastClickedSquare.getY()] = promotionPiece;
+        Board.circBoxes.add(Pieces.getBoardSquare(lastClickedSquare).getLabel());
+        Pieces.setBoardSquare(lastClickedSquare, promotionPiece);
         Board.boardPanel[lastClickedSquare.getX()][lastClickedSquare.getY()].add(promotionPiece.getLabel());
         waitingForPromotion = false;
         Pieces.switchAndPrepareForNextTurn(Main.curTurn, PType.PAWN, lastClickedSquare, lastClickedSquare);
