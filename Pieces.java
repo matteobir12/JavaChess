@@ -101,11 +101,11 @@ public class Pieces {
                 moveable = bishopMovement(square, p.getColor());
                 break;
             case QUEEN:
-            moveable = rookMovement(square, p.getColor());
-            moveable.addAll(bishopMovement(square, p.getColor()));
+                moveable = rookMovement(square, p.getColor());
+                moveable.addAll(bishopMovement(square, p.getColor()));
                 break;
             case KING:
-            moveable.addAll(kingMovement(square, p.getColor(), true));
+                moveable.addAll(kingMovement(square, p.getColor(), true));
                 break;
         }
         restrictMovementIfInCheck(square, moveable);
