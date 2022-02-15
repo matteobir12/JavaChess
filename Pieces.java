@@ -179,10 +179,10 @@ public class Pieces {
             boolean castleShort = isWhite ? whiteCanCastleShort : blackCanCastleShort;
             boolean castleLong = isWhite ? whiteCanCastleLong : blackCanCastleLong;
             int yVal = isWhite ? 7 : 0;
-            if((castleLong&&board[3][yVal]==null)&&board[2][yVal]==null&&board[1][yVal]==null&&threats.isEmpty()&&threatsToPiece(taker, new Square(3, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(2, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(1, yVal),null,null).isEmpty()){
+            if((castleLong&&board[3][yVal]==null)&&board[2][yVal]==null&&board[1][yVal]==null&&threats.isEmpty()&&board[0][yVal].getType()==PType.ROOK&&threatsToPiece(taker, new Square(3, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(2, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(1, yVal),null,null).isEmpty()){
                 moveable.add(new Square(2, yVal));
             }
-            if((castleShort&&board[5][yVal]==null)&&board[6][yVal]==null&&threats.isEmpty()&&threatsToPiece(taker, new Square(5, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(6, yVal),null,null).isEmpty()){
+            if((castleShort&&board[5][yVal]==null)&&board[6][yVal]==null&&threats.isEmpty()&&board[7][yVal].getType()==PType.ROOK&&threatsToPiece(taker, new Square(5, yVal),null,null).isEmpty()&&threatsToPiece(taker, new Square(6, yVal),null,null).isEmpty()){
                 moveable.add(new Square(6, yVal));
             }
             if(bKingSquare.getX()-wKingSquare.getX()<=2 && bKingSquare.getX()-wKingSquare.getX()>=-2&&bKingSquare.getY()-wKingSquare.getY()<=2 && bKingSquare.getY()-wKingSquare.getY()>=-2){
