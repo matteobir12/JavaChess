@@ -365,7 +365,7 @@ public class Pieces {
             return (blocker.getX() ==toBlock.getX()&&((blocker.getY()<toBlock.getY()&&blocker.getY()>attacker.getY())||(blocker.getY()>toBlock.getY()&&blocker.getY()<attacker.getY())));
         }
         if(toBlock.getY()==attacker.getY()){
-            return (blocker.getY() ==toBlock.getY()&&((blocker.getX()<toBlock.getX()&&blocker.getX()>attacker.getX())||(blocker.getX()>toBlock.getX()&&blocker.getX()<attacker.getX())));
+            return (blocker.getY() == toBlock.getY()&&((blocker.getX()<toBlock.getX()&&blocker.getX()>attacker.getX())||(blocker.getX()>toBlock.getX()&&blocker.getX()<attacker.getX())));
         }
         //otherwise they must be being attacked by a diagonal
         Square sq = new Square();
@@ -431,16 +431,14 @@ public class Pieces {
             //by one attacker
             if (threats.size()==1){
                 Square curking = (Main.curTurn == PColor.BLACK) ? bKingSquare : wKingSquare;
-            boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].getType()==PType.KNIGHT);
-            Iterator<Square> iter = movement.iterator(); 
-            while(iter.hasNext()){
-                Square tmpS = iter.next();
-                // if it can take the piece that put it in check or that piece blocks the check
-                if(tmpS.equals(threats.get(0)) || (!isKnight && Pieces.pieceBlocks(curking,threats.get(0),tmpS))){
-                    continue;
+                boolean isKnight = (Pieces.board[threats.get(0).getX()][threats.get(0).getY()].getType()==PType.KNIGHT);
+                Iterator<Square> iter = movement.iterator(); 
+                while(iter.hasNext()){
+                    Square tmpS = iter.next();
+                    // if it can take the piece that put it in check or that piece blocks the check
+                    if(tmpS.equals(threats.get(0)) || (!isKnight && Pieces.pieceBlocks(curking,threats.get(0),tmpS))) continue;
+                    iter.remove();
                 }
-                iter.remove();
-            }
             }else{
                 if(!square.equals(bKingSquare) && !square.equals(wKingSquare)){
                     for(int i = 0; i<movement.size(); i++){
@@ -457,14 +455,13 @@ public class Pieces {
             for(int i=0; i<pinned.size();i++){
                 //is it the piece they clicked
                 if(square.equals(pinned.get(i))){
-                    Square curking = (Main.curTurn == PColor.BLACK) ? bKingSquare : wKingSquare ; 
+                    Square curking = (Main.curTurn == PColor.BLACK) ? bKingSquare : wKingSquare;
                     Iterator<Square> iter = movement.iterator(); 
                     while(iter.hasNext()){
                         Square tmpS = iter.next();
                         //if the move doesnt break the pin
-                        if(pieceBlocks(curking, pinners.get(i), tmpS) || tmpS.equals(pinners.get(i))){
-                            continue;
-                    }
+                        if(pieceBlocks(curking, pinners.get(i), tmpS) || tmpS.equals(pinners.get(i))) continue;
+
                     iter.remove();
                     }   
                 }
